@@ -1,20 +1,22 @@
 package main
 
+import "time"
+
 type GeoLocation struct {
-	Latitude      string `json:"latitude"`
-	Longitude     string `json:"longitude"`
-	NeedsRecoding bool   `json:"needs_recoding"`
+	Latitude      float64 `json:"latitude"`
+	Longitude     float64 `json:"longitude"`
+	NeedsRecoding bool    `json:"needs_recoding"`
 }
 
 type MetoriteLanding struct {
-	ID          string      `json:"id"`
-	Year        string      `json:"year"`
+	ID          int         `json:"id"`
+	Year        time.Time   `json:"year"`
 	Name        string      `json:"name"`
 	Nametype    string      `json:"nametype"`
 	Recclass    string      `json:"recclass"`
-	Mass        string      `json:"mass"`
+	Mass        float64     `json:"mass"`
 	Fall        string      `json:"fall"`
-	Reclat      string      `json:"reclat"`
-	Reclong     string      `json:"reclong"`
+	Reclat      float64     `json:"reclat"`
+	Reclong     float64     `json:"reclong"`
 	GeoLocation GeoLocation `json:"geolocation"`
 }

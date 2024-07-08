@@ -29,10 +29,13 @@ type Server struct {
 	repo Repository
 }
 
-func NewServer(addr string, repo Repository) *Server {
+func NewServer(
+	addr string,
+	// repo Repository,
+) *Server {
 	return &Server{
 		Addr: addr,
-		repo: repo,
+		// repo: repo,
 	}
 }
 

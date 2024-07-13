@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/DanTDM2003/search-api-docker-redis/config"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/postgres"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/database"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/httpserver"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
@@ -16,12 +16,11 @@ func main() {
 		panic(err)
 	}
 
-	conn, err := postgres.Connect(cfg.Postgres)
+	conn, err := database.Connect(cfg.Postgres)
 	if err != nil {
 		log.Fatalf("Could not connect to the database: %v", err)
 		panic(err)
 	}
-	defer postgres.Close(conn.DB)
 
 	l := pkgLog.InitializeZapLogger(pkgLog.ZapConfig{
 		Level:    cfg.Logger.Level,

@@ -3,13 +3,14 @@ package response
 import (
 	"net/http"
 
+	"github.com/DanTDM2003/search-api-docker-redis/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
 type Resp struct {
 	ErrorCode int    `json:"error_code"`
 	Message   string `json:"message"`
-	Data      any    `json:"data"`
+	Data      any    `json:"data,omitempty"`
 }
 
 func Success(c *gin.Context, data any) {
@@ -20,10 +21,27 @@ func Success(c *gin.Context, data any) {
 	})
 }
 
+func parseError(err error) (int, Resp) {
+	switch parsedErr := err.(type) {
+	case errors.HTTPError:
+		statusCode := parsedErr.StatusCode
+
+		if statusCode == 0 {
+			statusCode = http.StatusBadRequest
+		}
+
+		return statusCode, Resp{
+			ErrorCode: parsedErr.Code,
+			Message:   parsedErr.Message,
+		}
+	default:
+		return http.StatusInternalServerError, Resp{
+			ErrorCode: 500,
+			Message:   DefaultErrorMessage,
+		}
+	}
+}
+
 func Error(c *gin.Context, err error) {
-	c.JSON(http.StatusInternalServerError, Resp{
-		ErrorCode: 1,
-		Message:   err.Error(),
-		Data:      nil,
-	})
+	c.JSON(parseError(err))
 }

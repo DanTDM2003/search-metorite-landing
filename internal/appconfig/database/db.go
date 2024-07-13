@@ -1,4 +1,4 @@
-package postgres
+package database
 
 import (
 	"database/sql"
@@ -6,10 +6,12 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/config"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type PostgresConnection struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
 func Connect(cfg config.PostgresConfig) (*PostgresConnection, error) {
@@ -33,8 +35,15 @@ func Connect(cfg config.PostgresConfig) (*PostgresConnection, error) {
 		return nil, err
 	}
 
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: db,
+	}), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
 	return &PostgresConnection{
-		DB: db,
+		DB: gormDB,
 	}, nil
 }
 

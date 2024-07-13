@@ -1,22 +1,21 @@
 package httpserver
 
 import (
-	"database/sql"
-
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type HTTPServer struct {
 	l        pkgLog.Logger
 	gin      *gin.Engine
 	port     int
-	database *sql.DB
+	database *gorm.DB
 }
 
 type Config struct {
 	Port     int
-	Database *sql.DB
+	Database *gorm.DB
 }
 
 func New(l pkgLog.Logger, cfg Config) *HTTPServer {

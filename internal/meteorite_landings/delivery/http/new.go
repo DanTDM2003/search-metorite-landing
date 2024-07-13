@@ -8,6 +8,9 @@ import (
 
 type Handler interface {
 	GetMeteoriteLandings(c *gin.Context)
+	GetOneMeteoriteLanding(c *gin.Context)
+	CreateMeteoriteLanding(c *gin.Context)
+	UpdateMeteoriteLanding(c *gin.Context)
 }
 
 type handler struct {

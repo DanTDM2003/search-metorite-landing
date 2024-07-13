@@ -1,4 +1,6 @@
-package main
+package utils
+
+// package main
 
 // import (
 // 	"encoding/json"
@@ -43,7 +45,7 @@ package main
 // 		query := `
 // 		INSERT INTO meteorite_landings (year, name, nametype, recclass, mass, fall, reclat, reclong, geolocation)
 // 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-// 		_, err = p.DB1.Exec(query, mL.Year, mL.Name, mL.Nametype, mL.Recclass, mL.Mass, mL.Fall, mL.Reclat, mL.Reclong, geolocationJSON)
+// 		_, err = p.DB1.Exec(query, mL.Year, mL.Name, mL.NameType, mL.Recclass, mL.Mass, mL.Fall, mL.Reclat, mL.Reclong, geolocationJSON)
 // 		if err != nil {
 // 			return err
 // 		}

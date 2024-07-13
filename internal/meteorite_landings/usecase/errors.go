@@ -1,5 +1,7 @@
 package usecase
 
+import "errors"
+
 var (
-	ErrMeteoriteLandingsNotFound = "Meteorite Landings not found"
+	ErrMeteoriteLandingsNotFound = errors.New("meteorite landings not found")
 )

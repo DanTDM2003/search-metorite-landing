@@ -13,13 +13,13 @@ type MeteoriteLanding struct {
 	gorm.Model
 	Year        time.Time   `json:"year"`
 	Name        string      `json:"name"`
-	Nametype    string      `json:"nametype"`
+	NameType    string      `json:"name_type"`
 	Recclass    string      `json:"recclass"`
 	Mass        float64     `json:"mass"`
 	Fall        string      `json:"fall"`
 	Reclat      float64     `json:"reclat"`
 	Reclong     float64     `json:"reclong"`
-	GeoLocation GeoLocation `json:"geolocation"`
+	GeoLocation GeoLocation `json:"geo_location"`
 }
 
 type GeoLocation struct {

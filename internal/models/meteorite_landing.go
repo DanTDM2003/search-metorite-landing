@@ -1,4 +1,4 @@
-package main
+package models
 
 import "time"
 
@@ -8,7 +8,7 @@ type GeoLocation struct {
 	NeedsRecoding bool    `json:"needs_recoding"`
 }
 
-type MetoriteLanding struct {
+type MeteoriteLanding struct {
 	ID          int         `json:"id"`
 	Year        time.Time   `json:"year"`
 	Name        string      `json:"name"`

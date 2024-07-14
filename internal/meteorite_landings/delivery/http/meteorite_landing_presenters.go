@@ -263,3 +263,7 @@ func (h handler) newUpdateMeteoriteLandingResp(mL models.MeteoriteLanding) Updat
 		UpdatedAt: response.DateTime(mL.UpdatedAt),
 	}
 }
+
+type DeleteMeteoriteLandingReq struct {
+	ID uint `uri:"id"`
+}

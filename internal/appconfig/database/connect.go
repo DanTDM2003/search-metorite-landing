@@ -47,6 +47,10 @@ func Connect(cfg config.PostgresConfig) (*PostgresConnection, error) {
 	}, nil
 }
 
-func Close(db *sql.DB) {
-	db.Close()
+func Close(db *gorm.DB) {
+	conn, err := db.DB()
+	if err != nil {
+		return
+	}
+	conn.Close()
 }

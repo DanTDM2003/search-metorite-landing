@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	errWrongQuery                = pkgError.NewHTTPError(10000, "Wrong query")
-	errWrongBody                 = pkgError.NewHTTPError(10001, "Wrong body")
-	errMeteoriteLandingsNotFound = pkgError.NewHTTPError(10002, "Meteorite landings not found")
+	errWrongQuery                     = pkgError.NewHTTPError(10000, "Wrong query")
+	errWrongBody                      = pkgError.NewHTTPError(10001, "Wrong body")
+	errMeteoriteLandingsNotFound      = pkgError.NewHTTPError(10002, "Meteorite landings not found")
+	errMeteoriteLandingsAlreadyExists = pkgError.NewHTTPError(10003, "Meteorite landings already exists")
 )
 
 func (h handler) mapError(err error) error {
@@ -19,6 +20,8 @@ func (h handler) mapError(err error) error {
 		return errWrongBody
 	case usecase.ErrMeteoriteLandingsNotFound:
 		return errMeteoriteLandingsNotFound
+	case usecase.ErrMeteoriteLandingAlreadyExists:
+		return errMeteoriteLandingsAlreadyExists
 	default:
 		return err
 	}

@@ -8,4 +8,5 @@ func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler) {
 	r.GET("/meteorite-landings/:id", h.GetOneMeteoriteLanding)
 	r.POST("/meteorite-landings", h.CreateMeteoriteLanding)
 	r.PATCH("/meteorite-landings/:id", h.UpdateMeteoriteLanding)
+	r.DELETE("/meteorite-landings/:id", h.DeleteMeteoriteLanding)
 }

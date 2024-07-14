@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
+	pkgRedis "github.com/DanTDM2003/search-api-docker-redis/pkg/redis"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -11,11 +12,13 @@ type HTTPServer struct {
 	gin      *gin.Engine
 	port     int
 	database *gorm.DB
+	redis    *pkgRedis.RedisClient
 }
 
 type Config struct {
 	Port     int
 	Database *gorm.DB
+	Redis    *pkgRedis.RedisClient
 }
 
 func New(l pkgLog.Logger, cfg Config) *HTTPServer {
@@ -24,5 +27,6 @@ func New(l pkgLog.Logger, cfg Config) *HTTPServer {
 		gin:      gin.Default(),
 		port:     cfg.Port,
 		database: cfg.Database,
+		redis:    cfg.Redis,
 	}
 }

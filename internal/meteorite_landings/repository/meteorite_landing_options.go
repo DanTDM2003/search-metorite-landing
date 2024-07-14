@@ -33,7 +33,6 @@ type CreateMeteoriteLandingOption struct {
 }
 
 type UpdateMeteoriteLandingOption struct {
-	ID          uint
 	Name        string
 	NameType    string
 	Year        time.Time

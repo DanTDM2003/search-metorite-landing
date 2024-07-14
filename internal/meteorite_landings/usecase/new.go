@@ -13,16 +13,19 @@ type Usecase interface {
 	GetOneMeteoriteLanding(ctx context.Context, input GetOneMeteoriteLandingInput) (models.MeteoriteLanding, error)
 	CreateMeteoriteLanding(ctx context.Context, input CreateMeteoriteLandingInput) (models.MeteoriteLanding, error)
 	UpdateMeteoriteLanding(ctx context.Context, input UpdateMeteoriteLandingInput) (models.MeteoriteLanding, error)
+	DeleteMeteoriteLanding(ctx context.Context, id uint) error
 }
 
 type impleUsecase struct {
-	l    pkgLog.Logger
-	repo repository.Repository
+	l     pkgLog.Logger
+	repo  repository.Repository
+	redis repository.RedisRepository
 }
 
-func New(l pkgLog.Logger, repo repository.Repository) Usecase {
+func New(l pkgLog.Logger, repo repository.Repository, redisRepo repository.RedisRepository) Usecase {
 	return &impleUsecase{
-		l:    l,
-		repo: repo,
+		l:     l,
+		repo:  repo,
+		redis: redisRepo,
 	}
 }

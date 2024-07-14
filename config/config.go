@@ -6,6 +6,7 @@ type Config struct {
 	HTTPServer HTTPServerConfig
 	Logger     LoggerConfig
 	Postgres   PostgresConfig
+	Redis      RedisConfig
 }
 
 type HTTPServerConfig struct {
@@ -26,6 +27,12 @@ type PostgresConfig struct {
 	Password string `env:"DATABASE_PASSWORD" envDefault:"postgres"`
 	DBName   string `env:"DATABASE_NAME" envDefault:"postgres"`
 	SSLMode  string `env:"DATABASE_SSL_MODE" envDefault:"disable"`
+}
+
+type RedisConfig struct {
+	Addr     string `env:"REDIS_ADDRESS" envDefault:"localhost"`
+	Password string `env:"REDIS_PASSWORD" envDefault:""`
+	DB       int    `env:"REDIS_DB" envDefault:"0"`
 }
 
 func Load() (*Config, error) {

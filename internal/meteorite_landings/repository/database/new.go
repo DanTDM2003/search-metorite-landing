@@ -12,8 +12,6 @@ type impleRepository struct {
 	db *gorm.DB
 }
 
-var _ repository.Repository = &impleRepository{}
-
 func New(l pkgLog.Logger, db *gorm.DB) repository.Repository {
 	return &impleRepository{
 		l:  l,

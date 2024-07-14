@@ -160,3 +160,36 @@ func (h handler) UpdateMeteoriteLanding(c *gin.Context) {
 
 	response.Success(c, h.newUpdateMeteoriteLandingResp(mL))
 }
+
+func (h handler) processDeleteMeteoriteLanding(c *gin.Context) (DeleteMeteoriteLandingReq, error) {
+	ctx := c.Request.Context()
+
+	var req DeleteMeteoriteLandingReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.ShouldBindUri: %v", err)
+		return DeleteMeteoriteLandingReq{}, errWrongQuery
+	}
+
+	return req, nil
+}
+
+func (h handler) DeleteMeteoriteLanding(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	req, err := h.processDeleteMeteoriteLanding(c)
+	if err != nil {
+		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.processDeleteMeteoriteLanding: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	err = h.uc.DeleteMeteoriteLanding(ctx, req.ID)
+	if err != nil {
+		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.uc.DeleteMeteoriteLanding: %v", err)
+		mapErr := h.mapError(err)
+		response.Error(c, mapErr)
+		return
+	}
+
+	response.Success(c, nil)
+}

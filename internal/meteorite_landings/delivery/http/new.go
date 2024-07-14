@@ -11,6 +11,7 @@ type Handler interface {
 	GetOneMeteoriteLanding(c *gin.Context)
 	CreateMeteoriteLanding(c *gin.Context)
 	UpdateMeteoriteLanding(c *gin.Context)
+	DeleteMeteoriteLanding(c *gin.Context)
 }
 
 type handler struct {

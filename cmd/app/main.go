@@ -5,6 +5,7 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/config"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/database"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/redis"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/httpserver"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
@@ -21,6 +22,14 @@ func main() {
 		log.Fatalf("Could not connect to the database: %v", err)
 		panic(err)
 	}
+	defer database.Close(conn.DB)
+
+	redis, err := redis.Connect(cfg.Redis)
+	if err != nil {
+		log.Fatalf("Could not connect to the redis: %v", err)
+		panic(err)
+	}
+	defer redis.RedisClient.Disconnect()
 
 	l := pkgLog.InitializeZapLogger(pkgLog.ZapConfig{
 		Level:    cfg.Logger.Level,
@@ -31,6 +40,7 @@ func main() {
 	srv := httpserver.New(l, httpserver.Config{
 		Port:     cfg.HTTPServer.Port,
 		Database: conn.DB,
+		Redis:    redis.RedisClient,
 	})
 	if err := srv.Run(); err != nil {
 		panic(err)

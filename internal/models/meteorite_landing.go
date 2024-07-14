@@ -10,16 +10,19 @@ import (
 )
 
 type MeteoriteLanding struct {
-	gorm.Model
-	Year        time.Time   `json:"year"`
-	Name        string      `json:"name"`
-	NameType    string      `json:"name_type"`
-	Recclass    string      `json:"recclass"`
-	Mass        float64     `json:"mass"`
-	Fall        string      `json:"fall"`
-	Reclat      float64     `json:"reclat"`
-	Reclong     float64     `json:"reclong"`
-	GeoLocation GeoLocation `json:"geo_location"`
+	ID          uint           `json:"id" gorm:"primaryKey"`
+	Year        time.Time      `json:"year"`
+	Name        string         `json:"name" gorm:"unique"`
+	NameType    string         `json:"name_type"`
+	Recclass    string         `json:"recclass"`
+	Mass        float64        `json:"mass"`
+	Fall        string         `json:"fall"`
+	Reclat      float64        `json:"reclat"`
+	Reclong     float64        `json:"reclong"`
+	GeoLocation GeoLocation    `json:"geo_location"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 
 type GeoLocation struct {

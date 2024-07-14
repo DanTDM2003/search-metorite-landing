@@ -23,8 +23,9 @@ func (uc impleRepository) buildCreateMeteoriteLandingModel(opt repository.Create
 	}
 }
 
-func (uc impleRepository) buildUpdateMeteoriteLandingModel(opt repository.UpdateMeteoriteLandingOption) models.MeteoriteLanding {
-	return models.MeteoriteLanding{
+func (uc impleRepository) buildUpdateMeteoriteLandingModel(opt repository.UpdateMeteoriteLandingOption, mL models.MeteoriteLanding) models.MeteoriteLanding {
+	update := models.MeteoriteLanding{
+		ID:       mL.ID,
 		Name:     opt.Name,
 		NameType: opt.NameType,
 		Year:     opt.Year,
@@ -38,5 +39,8 @@ func (uc impleRepository) buildUpdateMeteoriteLandingModel(opt repository.Update
 			Longitude:     opt.GeoLocation.Longitude,
 			NeedsRecoding: opt.GeoLocation.NeedsRecoding,
 		},
+		CreatedAt: mL.CreatedAt,
 	}
+
+	return update
 }

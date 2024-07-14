@@ -2,11 +2,13 @@ package database
 
 import (
 	"context"
+	"errors"
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
-	_ "github.com/lib/pq"
+	"github.com/DanTDM2003/search-api-docker-redis/pkg/postgres"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -46,40 +48,61 @@ func (repo impleRepository) GetMetoriteLandings(ctx context.Context, opt reposit
 	}, nil
 }
 
-func (uc impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repository.GetOneMeteoriteLandingOption) (models.MeteoriteLanding, error) {
-	table := uc.getTable()
+func (repo impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repository.GetOneMeteoriteLandingOption) (models.MeteoriteLanding, error) {
+	table := repo.getTable()
 	var mL models.MeteoriteLanding
 
 	if err := table.Where("id = ?", opt.ID).First(&mL).Error; err != nil {
-		uc.l.Errorf(ctx, "meteorite_landings.repository.database.GetOneMeteoriteLanding.db.First: %v", err)
+		repo.l.Errorf(ctx, "meteorite_landings.repository.database.GetOneMeteoriteLanding.db.First: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
 
 	return mL, nil
 }
 
-func (uc impleRepository) CreateMeteoriteLanding(ctx context.Context, opt repository.CreateMeteoriteLandingOption) (models.MeteoriteLanding, error) {
-	table := uc.getTable()
-
-	mL := uc.buildCreateMeteoriteLandingModel(opt)
-
-	if err := table.Create(&mL).Error; err != nil {
-		uc.l.Errorf(ctx, "meteorite_landings.repository.database.CreateMeteoriteLanding.db.Create: %v", err)
-		return models.MeteoriteLanding{}, err
-	}
-
-	return mL, nil
-}
-
-func (repo impleRepository) UpdateMeteoriteLanding(ctx context.Context, opt repository.UpdateMeteoriteLandingOption) (models.MeteoriteLanding, error) {
+func (repo impleRepository) CreateMeteoriteLanding(ctx context.Context, opt repository.CreateMeteoriteLandingOption) (models.MeteoriteLanding, error) {
 	table := repo.getTable()
 
-	mL := repo.buildUpdateMeteoriteLandingModel(opt)
+	mL := repo.buildCreateMeteoriteLandingModel(opt)
 
-	if err := table.Where("id = ?", opt.ID).Updates(&mL).Error; err != nil {
+	if err := table.Create(&mL).Error; err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == postgres.ErrDuplicatedKeyCode {
+			repo.l.Warnf(ctx, "meteorite_landings.repository.database.CreateMeteoriteLanding.db.Create: %v", err)
+			return models.MeteoriteLanding{}, gorm.ErrCheckConstraintViolated
+		}
+		repo.l.Errorf(ctx, "meteorite_landings.repository.database.CreateMeteoriteLanding.db.Create: %v", err)
+		return models.MeteoriteLanding{}, err
+	}
+
+	return mL, nil
+}
+
+func (repo impleRepository) UpdateMeteoriteLanding(ctx context.Context, opt repository.UpdateMeteoriteLandingOption, mL models.MeteoriteLanding) (models.MeteoriteLanding, error) {
+	table := repo.getTable()
+
+	update := repo.buildUpdateMeteoriteLandingModel(opt, mL)
+
+	if err := table.Where("id = ?", update.ID).Updates(&update).Error; err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == postgres.ErrDuplicatedKeyCode {
+			repo.l.Warnf(ctx, "meteorite_landings.repository.database.UpdateMeteoriteLanding.db.Updates: %v", err)
+			return models.MeteoriteLanding{}, gorm.ErrCheckConstraintViolated
+		}
 		repo.l.Errorf(ctx, "meteorite_landings.repository.database.UpdateMeteoriteLanding.db.Updates: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
 
-	return mL, nil
+	return update, nil
+}
+
+func (repo impleRepository) DeleteMeteoriteLanding(ctx context.Context, id uint) error {
+	table := repo.getTable()
+
+	if err := table.Where("id = ?", id).Delete(&models.MeteoriteLanding{}).Error; err != nil {
+		repo.l.Errorf(ctx, "meteorite_landings.repository.database.DeleteMeteoriteLanding.db.Delete: %v", err)
+		return err
+	}
+
+	return nil
 }

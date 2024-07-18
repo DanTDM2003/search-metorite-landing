@@ -7,10 +7,13 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/database"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/appconfig/redis"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/httpserver"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
+	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 )
 
 func main() {
+	//
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Could not load the configuration: %v", err)
@@ -23,6 +26,11 @@ func main() {
 		panic(err)
 	}
 	defer database.Close(conn.DB)
+
+	exists := conn.DB.Migrator().HasTable(&models.MeteoriteLanding{})
+	if !exists {
+		utils.InitDatabase(conn)
+	}
 
 	redis, err := redis.Connect(cfg.Redis)
 	if err != nil {

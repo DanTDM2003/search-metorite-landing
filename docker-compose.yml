@@ -1,0 +1,58 @@
+services:
+  go_db:
+    container_name: go_db
+    image: postgres:14.12
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=meteorite_forum
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db_manage:
+    container_name: db_manage
+    image: dpage/pgadmin4
+    ports:
+      - "5050:5050"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  meteorite_forum:
+    build: .
+    container_name: meteorite_forum
+    environment:
+      APP_PORT: 8083
+      DATABASE_HOST: go_db
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_NAME: meteorite_forum
+      DATABASE_PASSWORD: postgres
+      DATABASE_SSL_MODE: disable
+      REDIS_ADDRESS: redis:6379
+      REDIS_DB: 0
+    ports:
+      - "8083:8083"
+    depends_on:
+      go_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: on-failure

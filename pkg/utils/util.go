@@ -17,13 +17,13 @@ func createTable(db *sql.DB) error {
 		id SERIAL PRIMARY KEY,
 		year DATE,
 		name TEXT,
-		nametype TEXT,
+		name_type TEXT,
 		recclass TEXT,
 		mass FLOAT8,
 		fall TEXT,
 		reclat FLOAT8,
 		reclong FLOAT8,
-		geolocation JSONB,
+		geo_location JSONB,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		deleted_at TIMESTAMP DEFAULT NULL
@@ -40,7 +40,7 @@ func insertMetoriteLandings(db *sql.DB, metoriteLandings []models.MeteoriteLandi
 		}
 
 		query := `
-		INSERT INTO meteorite_landings (year, name, nametype, recclass, mass, fall, reclat, reclong, geolocation)
+		INSERT INTO meteorite_landings (year, name, name_type, recclass, mass, fall, reclat, reclong, geo_location)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 		_, err = db.Exec(query, mL.Year, mL.Name, mL.NameType, mL.Recclass, mL.Mass, mL.Fall, mL.Reclat, mL.Reclong, geolocationJSON)
 		if err != nil {

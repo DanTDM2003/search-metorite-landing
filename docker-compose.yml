@@ -36,6 +36,7 @@ services:
       retries: 5
 
   meteorite_forum:
+    image: dantdm2003/meteorite_forum
     build: .
     container_name: meteorite_forum
     environment:

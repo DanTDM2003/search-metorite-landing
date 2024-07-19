@@ -35,6 +35,10 @@ services:
       timeout: 5s
       retries: 5
 
+  redis_manage:
+    container_name: redis_manage
+    image: redis
+
   meteorite_forum:
     image: dantdm2003/meteorite_forum
     build: .

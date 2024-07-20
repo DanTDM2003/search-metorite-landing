@@ -19,9 +19,9 @@ type MeteoriteLanding struct {
 	Fall        string         `json:"fall"`
 	Reclat      float64        `json:"reclat"`
 	Reclong     float64        `json:"reclong"`
-	GeoLocation GeoLocation    `json:"geo_location"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
+	GeoLocation GeoLocation    `json:"geo_location" gorm:"type:jsonb"`
+	CreatedAt   time.Time      `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 

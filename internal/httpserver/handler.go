@@ -5,9 +5,12 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/database"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/redis"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/middlware"
 )
 
 func (srv HTTPServer) mapHandlers() error {
+	srv.gin.Use(middlware.Recovery())
+
 	meteoriteLandingRepo := database.New(srv.l, srv.database)
 	meteoriteLandingRedisRepo := redis.New(srv.l, srv.redis)
 	meteoriteLandingUC := usecase.New(srv.l, meteoriteLandingRepo, meteoriteLandingRedisRepo)

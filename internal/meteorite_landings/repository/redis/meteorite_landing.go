@@ -42,3 +42,14 @@ func (redisRepo impleRedisRepository) GetMeteoriteLanding(ctx context.Context, i
 
 	return mL, nil
 }
+
+func (redisRepo impleRedisRepository) DeleteMeteoriteLanding(ctx context.Context, id uint) error {
+	key := fmt.Sprintf("meteorite_landing:%d", id)
+	err := redisRepo.redis.Del(ctx, key)
+	if err != nil {
+		redisRepo.l.Errorf(ctx, "redis.repository.DeleteMeteoriteLanding.redis.Del: %v", err)
+		return err
+	}
+
+	return nil
+}

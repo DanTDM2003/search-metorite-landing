@@ -45,3 +45,11 @@ func parseError(err error) (int, Resp) {
 func Error(c *gin.Context, err error) {
 	c.JSON(parseError(err))
 }
+
+func PanicError(c *gin.Context, err any) {
+	if err == nil {
+		c.JSON(parseError(nil))
+	} else {
+		c.JSON(parseError(err.(error)))
+	}
+}

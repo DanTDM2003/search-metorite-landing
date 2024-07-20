@@ -149,5 +149,10 @@ func (uc impleUsecase) DeleteMeteoriteLanding(ctx context.Context, id uint) erro
 		return err
 	}
 
+	if err := uc.redis.DeleteMeteoriteLanding(ctx, id); err != nil {
+		uc.l.Errorf(ctx, "meteorite_landings.usecase.DeleteMeteoriteLanding.redis.DeleteMeteoriteLanding: %v", err)
+		return err
+	}
+
 	return nil
 }

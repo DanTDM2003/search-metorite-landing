@@ -44,6 +44,10 @@ func (r RedisClient) Expire(ctx context.Context, key string, expiration time.Dur
 	return r.redis.Expire(ctx, key, expiration).Err()
 }
 
+func (r RedisClient) Exists(ctx context.Context, key string) (int64, error) {
+	return r.redis.Exists(ctx, key).Result()
+}
+
 func (r *RedisClient) Disconnect() error {
 	return r.redis.Close()
 }

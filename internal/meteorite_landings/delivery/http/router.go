@@ -4,9 +4,9 @@ import "github.com/gin-gonic/gin"
 
 func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler) {
 	r.Use()
-	r.GET("/meteorite-landings", h.GetMeteoriteLandings)
-	r.GET("/meteorite-landings/:id", h.GetOneMeteoriteLanding)
-	r.POST("/meteorite-landings", h.CreateMeteoriteLanding)
-	r.PATCH("/meteorite-landings/:id", h.UpdateMeteoriteLanding)
-	r.DELETE("/meteorite-landings/:id", h.DeleteMeteoriteLanding)
+	r.GET("", h.GetMeteoriteLandings)
+	r.GET("/:id", h.GetOneMeteoriteLanding)
+	r.POST("", h.CreateMeteoriteLanding)
+	r.PATCH("/:id", h.UpdateMeteoriteLanding)
+	r.DELETE("/:id", h.DeleteMeteoriteLanding)
 }

@@ -66,11 +66,11 @@ func (h handler) newGetMeteoriteLandingsResp(o usecase.GetMeteoriteLandingsOutpu
 	}
 }
 
-type GetOneMeteoriteLandingReq struct {
+type getOneMeteoriteLandingReq struct {
 	ID uint `uri:"id"`
 }
 
-type GetOneMeteoriteLandingResp struct {
+type getOneMeteoriteLandingResp struct {
 	ID          uint              `json:"id"`
 	Name        string            `json:"name"`
 	NameType    string            `json:"name_type"`
@@ -85,8 +85,8 @@ type GetOneMeteoriteLandingResp struct {
 	UpdatedAt   response.DateTime `json:"updated_at"`
 }
 
-func (h handler) newGetOneMeteoriteLandingResp(mL models.MeteoriteLanding) GetOneMeteoriteLandingResp {
-	return GetOneMeteoriteLandingResp{
+func (h handler) newGetOneMeteoriteLandingResp(mL models.MeteoriteLanding) getOneMeteoriteLandingResp {
+	return getOneMeteoriteLandingResp{
 		ID:       mL.ID,
 		Name:     mL.Name,
 		NameType: mL.NameType,
@@ -106,7 +106,7 @@ func (h handler) newGetOneMeteoriteLandingResp(mL models.MeteoriteLanding) GetOn
 	}
 }
 
-type CreateMeteoriteLandingReq struct {
+type createMeteoriteLandingReq struct {
 	Name        string      `json:"name" binding:"required"`
 	NameType    string      `json:"name_type" binding:"required"`
 	Year        string      `json:"year" binding:"required"`
@@ -118,7 +118,7 @@ type CreateMeteoriteLandingReq struct {
 	GeoLocation geoLocation `json:"geo_location" binding:"required"`
 }
 
-func (req CreateMeteoriteLandingReq) validate() error {
+func (req createMeteoriteLandingReq) validate() error {
 	_, err := time.Parse(utils.StandardDateTime, req.Year)
 	if err != nil {
 		return errWrongBody
@@ -127,7 +127,7 @@ func (req CreateMeteoriteLandingReq) validate() error {
 	return nil
 }
 
-func (req CreateMeteoriteLandingReq) toInput() usecase.CreateMeteoriteLandingInput {
+func (req createMeteoriteLandingReq) toInput() usecase.CreateMeteoriteLandingInput {
 	input := usecase.CreateMeteoriteLandingInput{
 		Name:     req.Name,
 		NameType: req.NameType,
@@ -148,7 +148,7 @@ func (req CreateMeteoriteLandingReq) toInput() usecase.CreateMeteoriteLandingInp
 	return input
 }
 
-type CreateMeteoriteLandingResp struct {
+type createMeteoriteLandingResp struct {
 	ID          uint              `json:"id"`
 	Name        string            `json:"name"`
 	NameType    string            `json:"name_type"`
@@ -163,8 +163,8 @@ type CreateMeteoriteLandingResp struct {
 	UpdatedAt   response.DateTime `json:"updated_at"`
 }
 
-func (h handler) newCreateMeteoriteLandingResp(mL models.MeteoriteLanding) CreateMeteoriteLandingResp {
-	return CreateMeteoriteLandingResp{
+func (h handler) newCreateMeteoriteLandingResp(mL models.MeteoriteLanding) createMeteoriteLandingResp {
+	return createMeteoriteLandingResp{
 		ID:       mL.ID,
 		Name:     mL.Name,
 		NameType: mL.NameType,
@@ -184,7 +184,7 @@ func (h handler) newCreateMeteoriteLandingResp(mL models.MeteoriteLanding) Creat
 	}
 }
 
-type UpdateMeteoriteLandingReq struct {
+type updateMeteoriteLandingReq struct {
 	ID          uint        `uri:"id"`
 	Name        string      `json:"name"`
 	NameType    string      `json:"name_type"`
@@ -197,7 +197,7 @@ type UpdateMeteoriteLandingReq struct {
 	GeoLocation geoLocation `json:"geo_location"`
 }
 
-func (req UpdateMeteoriteLandingReq) validate() error {
+func (req updateMeteoriteLandingReq) validate() error {
 	_, err := time.Parse(utils.StandardDateTime, req.Year)
 	if err != nil {
 		return errWrongBody
@@ -206,7 +206,7 @@ func (req UpdateMeteoriteLandingReq) validate() error {
 	return nil
 }
 
-func (req UpdateMeteoriteLandingReq) toInput() usecase.UpdateMeteoriteLandingInput {
+func (req updateMeteoriteLandingReq) toInput() usecase.UpdateMeteoriteLandingInput {
 	input := usecase.UpdateMeteoriteLandingInput{
 		ID:       req.ID,
 		Name:     req.Name,
@@ -228,7 +228,7 @@ func (req UpdateMeteoriteLandingReq) toInput() usecase.UpdateMeteoriteLandingInp
 	return input
 }
 
-type UpdateMeteoriteLandingResp struct {
+type updateMeteoriteLandingResp struct {
 	ID          uint              `json:"id"`
 	Name        string            `json:"name"`
 	NameType    string            `json:"name_type"`
@@ -243,8 +243,8 @@ type UpdateMeteoriteLandingResp struct {
 	UpdatedAt   response.DateTime `json:"updated_at"`
 }
 
-func (h handler) newUpdateMeteoriteLandingResp(mL models.MeteoriteLanding) UpdateMeteoriteLandingResp {
-	return UpdateMeteoriteLandingResp{
+func (h handler) newUpdateMeteoriteLandingResp(mL models.MeteoriteLanding) updateMeteoriteLandingResp {
+	return updateMeteoriteLandingResp{
 		ID:       mL.ID,
 		Name:     mL.Name,
 		NameType: mL.NameType,
@@ -264,6 +264,6 @@ func (h handler) newUpdateMeteoriteLandingResp(mL models.MeteoriteLanding) Updat
 	}
 }
 
-type DeleteMeteoriteLandingReq struct {
+type deleteMeteoriteLandingReq struct {
 	ID uint `uri:"id"`
 }

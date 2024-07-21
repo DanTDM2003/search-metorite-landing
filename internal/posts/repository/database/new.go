@@ -6,13 +6,13 @@ import (
 )
 
 type impleRepository struct {
-	log pkgLog.Logger
-	db  *gorm.DB
+	l  pkgLog.Logger
+	db *gorm.DB
 }
 
-func New(l pkgLog.Logger, db *gorm.DB) *impleRepository {
-	return &impleRepository{
-		log: l,
-		db:  db,
+func New(l pkgLog.Logger, db *gorm.DB) impleRepository {
+	return impleRepository{
+		l:  l,
+		db: db,
 	}
 }

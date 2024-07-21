@@ -11,7 +11,7 @@ import (
 )
 
 func migrateMetoriteLandings(db *gorm.DB, table interface{}) error {
-	err := db.AutoMigrate(table)
+	err := db.AutoMigrate(&table)
 	if err != nil {
 		log.Fatalf("failed to auto migrate table: %v", err)
 	}
@@ -30,7 +30,8 @@ func migrateMetoriteLandings(db *gorm.DB, table interface{}) error {
 }
 
 func insertMetoriteLandings(db *gorm.DB, mLs []models.MeteoriteLanding) error {
-	for _, mL := range mLs {
+	for i, mL := range mLs {
+		mL.ID = uint(i + 1)
 		err := db.Create(&mL).Error
 		if err != nil {
 			return err

@@ -8,7 +8,7 @@ import (
 )
 
 func migratePosts(db *gorm.DB, table interface{}) error {
-	err := db.AutoMigrate(table)
+	err := db.AutoMigrate(&table)
 	if err != nil {
 		log.Fatalf("failed to auto migrate table: %v", err)
 	}

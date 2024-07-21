@@ -2,24 +2,9 @@ package http
 
 import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/usecase"
-	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
 )
-
-func (h handler) processGetMeteoriteLandingsReq(c *gin.Context) (paginator.PaginatorQuery, error) {
-	ctx := c.Request.Context()
-
-	var pagQuery paginator.PaginatorQuery
-	if err := c.ShouldBindQuery(&pagQuery); err != nil {
-		h.l.Errorf(ctx, "http.handler.GetMeteoriteLandings.ShouldBindQuery: %v", errWrongQuery)
-		return paginator.PaginatorQuery{}, errWrongQuery
-	}
-
-	pagQuery.Adjust()
-
-	return pagQuery, nil
-}
 
 func (h handler) GetMeteoriteLandings(c *gin.Context) {
 	ctx := c.Request.Context()
@@ -42,18 +27,6 @@ func (h handler) GetMeteoriteLandings(c *gin.Context) {
 	}
 
 	response.Success(c, h.newGetMeteoriteLandingsResp(o))
-}
-
-func (h handler) processGetOneMeteoriteLandingsReq(c *gin.Context) (GetOneMeteoriteLandingReq, error) {
-	ctx := c.Request.Context()
-
-	var req GetOneMeteoriteLandingReq
-	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Errorf(ctx, "http.handler.GetOneMeteoriteLanding.ShouldBindUri: %v", errWrongQuery)
-		return GetOneMeteoriteLandingReq{}, errWrongQuery
-	}
-
-	return req, nil
 }
 
 func (h handler) GetOneMeteoriteLanding(c *gin.Context) {
@@ -79,24 +52,6 @@ func (h handler) GetOneMeteoriteLanding(c *gin.Context) {
 	response.Success(c, h.newGetOneMeteoriteLandingResp(mL))
 }
 
-func (h handler) processCreateMeteoriteLanding(c *gin.Context) (CreateMeteoriteLandingReq, error) {
-	ctx := c.Request.Context()
-
-	var req CreateMeteoriteLandingReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "http.handler.CreateMeteoriteLanding.ShouldBindJSON: %v", err)
-		return CreateMeteoriteLandingReq{}, errWrongQuery
-	}
-
-	if err := req.validate(); err != nil {
-		h.l.Errorf(ctx, "http.handler.CreateMeteoriteLanding.validate: %v", err)
-		return CreateMeteoriteLandingReq{}, err
-	}
-
-	return req, nil
-
-}
-
 func (h handler) CreateMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -118,28 +73,6 @@ func (h handler) CreateMeteoriteLanding(c *gin.Context) {
 	response.Success(c, h.newCreateMeteoriteLandingResp(mL))
 }
 
-func (h handler) processUpdateMeteoriteLanding(c *gin.Context) (UpdateMeteoriteLandingReq, error) {
-	ctx := c.Request.Context()
-
-	var req UpdateMeteoriteLandingReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateMeteoriteLanding.ShouldBindJSON: %v", err)
-		return UpdateMeteoriteLandingReq{}, errWrongQuery
-	}
-
-	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateMeteoriteLanding.ShouldBindUri: %v", err)
-		return UpdateMeteoriteLandingReq{}, errWrongQuery
-	}
-
-	if err := req.validate(); err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateMeteoriteLanding.validate: %v", err)
-		return UpdateMeteoriteLandingReq{}, err
-	}
-
-	return req, nil
-}
-
 func (h handler) UpdateMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -159,18 +92,6 @@ func (h handler) UpdateMeteoriteLanding(c *gin.Context) {
 	}
 
 	response.Success(c, h.newUpdateMeteoriteLandingResp(mL))
-}
-
-func (h handler) processDeleteMeteoriteLanding(c *gin.Context) (DeleteMeteoriteLandingReq, error) {
-	ctx := c.Request.Context()
-
-	var req DeleteMeteoriteLandingReq
-	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.ShouldBindUri: %v", err)
-		return DeleteMeteoriteLandingReq{}, errWrongQuery
-	}
-
-	return req, nil
 }
 
 func (h handler) DeleteMeteoriteLanding(c *gin.Context) {

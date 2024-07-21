@@ -1,23 +1,31 @@
 package httpserver
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/delivery/http"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/database"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/redis"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/usecase"
+	mLHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/delivery/http"
+	mLDB "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/database"
+	mLRedis "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/redis"
+	mLUC "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/usecase"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/middlware"
+	userHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/users/delivery/http"
+	userDB "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/database"
+	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 )
 
 func (srv HTTPServer) mapHandlers() error {
 	srv.gin.Use(middlware.Recovery())
 
-	meteoriteLandingRepo := database.New(srv.l, srv.database)
-	meteoriteLandingRedisRepo := redis.New(srv.l, srv.redis)
-	meteoriteLandingUC := usecase.New(srv.l, meteoriteLandingRepo, meteoriteLandingRedisRepo)
-	meteoriteLandingH := http.New(srv.l, meteoriteLandingUC)
+	meteoriteLandingRepo := mLDB.New(srv.l, srv.database)
+	meteoriteLandingRedisRepo := mLRedis.New(srv.l, srv.redis)
+	meteoriteLandingUC := mLUC.New(srv.l, meteoriteLandingRepo, meteoriteLandingRedisRepo)
+	meteoriteLandingH := mLHTTP.New(srv.l, meteoriteLandingUC)
+
+	userRepo := userDB.New(srv.l, srv.database)
+	userUC := userUC.New(srv.l, userRepo)
+	userH := userHTTP.New(srv.l, userUC)
 
 	api := srv.gin.Group("api/v1")
-	http.MapMeteoriteLandingRoutes(api, meteoriteLandingH)
+	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH)
+	userHTTP.MapUserRoutes(api.Group("users"), userH)
 
 	return nil
 }

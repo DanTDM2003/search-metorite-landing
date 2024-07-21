@@ -14,10 +14,6 @@ var (
 
 func (h handler) mapError(err error) error {
 	switch err {
-	case errWrongQuery:
-		return errWrongQuery
-	case errWrongBody:
-		return errWrongBody
 	case usecase.ErrMeteoriteLandingsNotFound:
 		return errMeteoriteLandingsNotFound
 	case usecase.ErrMeteoriteLandingAlreadyExists:

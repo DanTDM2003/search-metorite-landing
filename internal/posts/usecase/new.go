@@ -8,11 +8,11 @@ type UseCase interface {
 }
 
 type impleUsecase struct {
-	log pkgLog.Logger
+	l pkgLog.Logger
 }
 
 func New(l pkgLog.Logger) UseCase {
 	return &impleUsecase{
-		log: l,
+		l: l,
 	}
 }

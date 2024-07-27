@@ -10,6 +10,7 @@ import (
 )
 
 type MeteoriteLanding struct {
+	gorm.Model
 	ID          uint           `json:"id" gorm:"primaryKey"`
 	Year        time.Time      `json:"year"`
 	Name        string         `json:"name" gorm:"unique"`

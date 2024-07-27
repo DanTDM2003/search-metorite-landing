@@ -13,6 +13,7 @@ var (
 	errUserNotFound     = pkgError.NewHTTPError(20004, "User not found")
 	errWrongPassword    = pkgError.NewHTTPError(20005, "Wrong password")
 	errUserAlreadyAdmin = pkgError.NewHTTPError(20006, "User already admin")
+	errEmailAlreadyUsed = pkgError.NewHTTPError(20007, "Email already used")
 )
 
 func (h handler) mapError(err error) error {
@@ -23,6 +24,8 @@ func (h handler) mapError(err error) error {
 		return errWrongPassword
 	case usecase.ErrUserAlreadyAdmin:
 		return errUserAlreadyAdmin
+	case usecase.ErrUserEmailExists:
+		return errEmailAlreadyUsed
 	default:
 		return err
 	}

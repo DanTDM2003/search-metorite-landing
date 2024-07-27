@@ -8,6 +8,7 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/middlware"
 	userHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/users/delivery/http"
 	userDB "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/database"
+	userRedis "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/redis"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 )
 
@@ -20,8 +21,11 @@ func (srv HTTPServer) mapHandlers() error {
 	meteoriteLandingH := mLHTTP.New(srv.l, meteoriteLandingUC)
 
 	userRepo := userDB.New(srv.l, srv.database)
-	userUC := userUC.New(srv.l, userRepo)
+	userRedisRepo := userRedis.New(srv.l, srv.redis)
+	userUC := userUC.New(srv.l, userRepo, userRedisRepo)
 	userH := userHTTP.New(srv.l, userUC)
+
+	
 
 	api := srv.gin.Group("api/v1")
 	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH)

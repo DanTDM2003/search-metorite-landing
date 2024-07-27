@@ -7,6 +7,7 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -26,15 +27,29 @@ func (uc impleUsecase) GetUsers(ctx context.Context, input GetUsersInput) (GetUs
 }
 
 func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (models.User, error) {
-	user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
-		ID: input.ID,
-	})
+	user, err := uc.redisRepo.GetUser(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Warnf(ctx, "users.usecase.GetUser.repo.GetOneUser: %v", ErrUserNotFound)
-			return models.User{}, ErrUserNotFound
+		if errors.Is(err, redis.Nil) {
+			user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
+				ID: input.ID,
+			})
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					uc.l.Warnf(ctx, "users.usecase.GetUser.repo.GetOneUser: %v", ErrUserNotFound)
+					return models.User{}, ErrUserNotFound
+				}
+				uc.l.Errorf(ctx, "users.usecase.GetUser.repo.GetOneUser: %v", err)
+				return models.User{}, err
+			}
+
+			if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+				uc.l.Errorf(ctx, "users.usecase.GetUser.redis.SetUser: %v", err)
+				return models.User{}, err
+			}
+
+			return user, nil
 		}
-		uc.l.Errorf(ctx, "users.usecase.GetUser.repo.GetOneUser: %v", err)
+		uc.l.Errorf(ctx, "users.usecase.GetUser.redis.GetUser: %v", err)
 		return models.User{}, err
 	}
 
@@ -44,7 +59,16 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 func (uc impleUsecase) CreateUser(ctx context.Context, input CreateUserInput) (models.User, error) {
 	user, err := uc.repo.CreateUser(ctx, input.toOptions())
 	if err != nil {
+		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
+			uc.l.Warnf(ctx, "users.usecase.CreateUser.repo.CreateUser: %v", ErrUserEmailExists)
+			return models.User{}, ErrUserEmailExists
+		}
 		uc.l.Errorf(ctx, "users.usecase.CreateUser.repo.CreateUser: %v", err)
+		return models.User{}, err
+	}
+
+	if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.CreateUser.redis.SetUser: %v", err)
 		return models.User{}, err
 	}
 
@@ -74,6 +98,11 @@ func (uc impleUsecase) UpdateUser(ctx context.Context, input UpdateUserInput) (m
 		return models.User{}, err
 	}
 
+	if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.UpdateUser.redis.SetUser: %v", err)
+		return models.User{}, err
+	}
+
 	return user, nil
 }
 
@@ -93,6 +122,11 @@ func (uc impleUsecase) DeleteUser(ctx context.Context, id uint) error {
 	err = uc.repo.DeleteUser(ctx, id)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.DeleteUser.repo.DeleteUser: %v", err)
+		return err
+	}
+
+	if err := uc.redisRepo.DeleteUser(ctx, id); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.DeleteUser.redis.DeleteUser: %v", err)
 		return err
 	}
 
@@ -125,6 +159,10 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
 	user, err := uc.repo.CreateUser(ctx, input.toOptions())
 	if err != nil {
+		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
+			uc.l.Warnf(ctx, "users.usecase.SignUp.repo.CreateUser: %v", ErrUserEmailExists)
+			return SignUpOutput{}, ErrUserEmailExists
+		}
 		uc.l.Errorf(ctx, "users.usecase.SignUp.repo.CreateUser: %v", err)
 		return SignUpOutput{}, err
 	}
@@ -160,6 +198,11 @@ func (uc impleUsecase) PromoteToAdmin(ctx context.Context, id uint) (models.User
 		return models.User{}, err
 	}
 
+	if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.PromoteToAdmin.redis.SetUser: %v", err)
+		return models.User{}, err
+	}
+
 	return user, nil
 }
 
@@ -186,6 +229,11 @@ func (uc impleUsecase) DemoteToUser(ctx context.Context, id uint) (models.User, 
 	}, user)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.DemoteToUser.repo.UpdateUser: %v", err)
+		return models.User{}, err
+	}
+
+	if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.DemoteToUser.redis.SetUser: %v", err)
 		return models.User{}, err
 	}
 

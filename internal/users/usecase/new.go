@@ -21,13 +21,15 @@ type UseCase interface {
 }
 
 type impleUsecase struct {
-	l    pkgLog.Logger
-	repo repository.Repository
+	l         pkgLog.Logger
+	repo      repository.Repository
+	redisRepo repository.RedisRepository
 }
 
-func New(l pkgLog.Logger, repo repository.Repository) UseCase {
+func New(l pkgLog.Logger, repo repository.Repository, reidsRepo repository.RedisRepository) UseCase {
 	return &impleUsecase{
-		l:    l,
-		repo: repo,
+		l:         l,
+		repo:      repo,
+		redisRepo: reidsRepo,
 	}
 }

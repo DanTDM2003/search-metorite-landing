@@ -40,8 +40,8 @@ func (repo impleRepository) GetUsers(ctx context.Context, opt repository.GetUser
 	}
 
 	return users, paginator.Paginator{
-		Total:       int64(len(users)),
-		Count:       total,
+		Total:       total,
+		Count:       int64(len(users)),
 		PerPage:     opt.Limit,
 		CurrentPage: opt.Page,
 	}, nil

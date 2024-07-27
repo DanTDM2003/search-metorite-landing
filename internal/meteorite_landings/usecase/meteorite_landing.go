@@ -48,6 +48,8 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 
 			return mL, nil
 		}
+		uc.l.Errorf(ctx, "meteorite_landings.usecase.GetOneMeteoriteLanding.redis.GetMeteoriteLanding: %v", err)
+		return models.MeteoriteLanding{}, err
 	}
 
 	return mL, nil

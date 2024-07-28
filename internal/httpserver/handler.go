@@ -1,6 +1,10 @@
 package httpserver
 
 import (
+	articleHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/articles/delivery/http"
+	articleDB "github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository/database"
+	articleRedis "github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository/redis"
+	articleUC "github.com/DanTDM2003/search-api-docker-redis/internal/articles/usecase"
 	mLHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/delivery/http"
 	mLDB "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/database"
 	mLRedis "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/redis"
@@ -34,10 +38,16 @@ func (srv HTTPServer) mapHandlers() error {
 	postUC := postUC.New(srv.l, postRepo, postRedisRepo)
 	postH := postHTTP.New(srv.l, postUC)
 
+	articleRepo := articleDB.New(srv.l, srv.database)
+	articleRedisRepo := articleRedis.New(srv.l, srv.redis)
+	articleUC := articleUC.New(srv.l, articleRepo, articleRedisRepo)
+	articleH := articleHTTP.New(srv.l, articleUC)
+
 	api := srv.gin.Group("api/v1")
 	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH)
 	userHTTP.MapUserRoutes(api.Group("users"), userH)
 	postHTTP.MapPostRoutes(api.Group("posts"), postH)
+	articleHTTP.MapArticleRoutes(api.Group("articles"), articleH)
 
 	return nil
 }

@@ -12,7 +12,10 @@ type impleRepository struct {
 	db *gorm.DB
 }
 
-func New(l pkgLog.Logger, db *gorm.DB) repository.Repository {
+func New(
+	l pkgLog.Logger,
+	db *gorm.DB,
+) repository.Repository {
 	return &impleRepository{
 		l:  l,
 		db: db,

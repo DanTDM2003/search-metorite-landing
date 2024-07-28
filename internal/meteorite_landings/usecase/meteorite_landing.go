@@ -29,7 +29,7 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 	mL, err := uc.redis.GetMeteoriteLanding(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			mL, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+			mL, err = uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
 				ID: input.ID,
 			})
 			if err != nil {
@@ -45,8 +45,6 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 				uc.l.Errorf(ctx, "meteorite_landings.usecase.GetOneMeteoriteLanding.redis.SetMeteoriteLanding: %v", err)
 				return models.MeteoriteLanding{}, err
 			}
-
-			return mL, nil
 		}
 		uc.l.Errorf(ctx, "meteorite_landings.usecase.GetOneMeteoriteLanding.redis.GetMeteoriteLanding: %v", err)
 		return models.MeteoriteLanding{}, err

@@ -51,8 +51,10 @@ func (repo impleRepository) GetMetoriteLandings(ctx context.Context, opt reposit
 func (repo impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repository.GetOneMeteoriteLandingOption) (models.MeteoriteLanding, error) {
 	table := repo.getTable()
 
+	cond, params := repo.buildGetOneMeteoriteLandingCondition(opt)
+
 	var mL models.MeteoriteLanding
-	if err := table.First(&mL, "id = ?", opt.ID).Error; err != nil {
+	if err := table.Where(cond, params).First(&mL).Error; err != nil {
 		repo.l.Errorf(ctx, "meteorite_landings.repository.database.GetOneMeteoriteLanding.db.First: %v", err)
 		return models.MeteoriteLanding{}, err
 	}

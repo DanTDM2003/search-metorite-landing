@@ -19,7 +19,10 @@ type handler struct {
 	uc usecase.Usecase
 }
 
-func New(l pkgLog.Logger, uc usecase.Usecase) Handler {
+func New(
+	l pkgLog.Logger,
+	uc usecase.Usecase,
+) Handler {
 	return &handler{
 		l:  l,
 		uc: uc,

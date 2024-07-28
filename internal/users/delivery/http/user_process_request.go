@@ -10,13 +10,13 @@ func (h handler) processGetUsersReq(c *gin.Context) (getUsersReq, paginator.Pagi
 
 	var req getUsersReq
 	if err := c.ShouldBindQuery(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processGetUsersReq.ShouldBindQuery: %v", err)
+		h.l.Warnf(ctx, "users.http.processGetUsersReq.ShouldBindQuery: %v", err)
 		return getUsersReq{}, paginator.PaginatorQuery{}, errWrongQuery
 	}
 
 	var pagQuery paginator.PaginatorQuery
 	if err := c.ShouldBindQuery(&pagQuery); err != nil {
-		h.l.Warnf(ctx, "http.handler.processGetUsersReq.ShouldBindQuery: %v", err)
+		h.l.Warnf(ctx, "users.http.processGetUsersReq.ShouldBindQuery: %v", err)
 		return getUsersReq{}, paginator.PaginatorQuery{}, errWrongQuery
 	}
 
@@ -30,7 +30,7 @@ func (h handler) processGetOneUserReq(c *gin.Context) (getOneUserReq, error) {
 
 	var req getOneUserReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processGetOneUserReq.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "users.http.processGetOneUserReq.ShouldBindUri: %v", err)
 		return getOneUserReq{}, errWrongQuery
 	}
 
@@ -42,12 +42,12 @@ func (h handler) processCreateUserReq(c *gin.Context) (createUserReq, error) {
 
 	var req createUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processCreateUserReq.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "users.http.processCreateUserReq.ShouldBindJSON: %v", err)
 		return createUserReq{}, errWrongBody
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.processCreateUserReq.validate: %v", err)
+		h.l.Warnf(ctx, "users.http.processCreateUserReq.validate: %v", err)
 		return createUserReq{}, err
 	}
 
@@ -59,17 +59,17 @@ func (h handler) processUpdateUserReq(c *gin.Context) (updateUserReq, error) {
 
 	var req updateUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processUpdateUserReq.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "users.http.processUpdateUserReq.ShouldBindJSON: %v", err)
 		return updateUserReq{}, errWrongBody
 	}
 
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processUpdateUserReq.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "users.http.processUpdateUserReq.ShouldBindUri: %v", err)
 		return updateUserReq{}, errWrongQuery
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.processUpdateUser.validate: %v", err)
+		h.l.Warnf(ctx, "users.http.processUpdateUser.validate: %v", err)
 		return updateUserReq{}, err
 	}
 
@@ -81,7 +81,7 @@ func (h handler) processDeleteUserReq(c *gin.Context) (deleteUserReq, error) {
 
 	var req deleteUserReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processDeleteUserReq.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "users.http.processDeleteUserReq.ShouldBindUri: %v", err)
 		return deleteUserReq{}, errWrongQuery
 	}
 
@@ -93,12 +93,12 @@ func (h handler) processSignInReq(c *gin.Context) (signInReq, error) {
 
 	var req signInReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processSignInReq.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "users.http.processSignInReq.ShouldBindJSON: %v", err)
 		return signInReq{}, errWrongBody
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.processSignInReq.validate: %v", err)
+		h.l.Warnf(ctx, "users.http.processSignInReq.validate: %v", err)
 		return signInReq{}, err
 	}
 
@@ -110,12 +110,12 @@ func (h handler) processSignUpReq(c *gin.Context) (signUpReq, error) {
 
 	var req signUpReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processSignUpReq.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "users.http.processSignUpReq.ShouldBindJSON: %v", err)
 		return signUpReq{}, errWrongBody
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.processSignUpReq.validate: %v", err)
+		h.l.Warnf(ctx, "users.http.processSignUpReq.validate: %v", err)
 		return signUpReq{}, err
 	}
 
@@ -127,7 +127,7 @@ func (h handler) processPromoteToAdminReq(c *gin.Context) (promoteToAdminReq, er
 
 	var req promoteToAdminReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processPromoteToAdminReq.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "users.http.processPromoteToAdminReq.ShouldBindUri: %v", err)
 		return promoteToAdminReq{}, errWrongQuery
 	}
 
@@ -139,7 +139,7 @@ func (h handler) processDemoteToUserReq(c *gin.Context) (demoteToUserReq, error)
 
 	var req demoteToUserReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.processDemoteToUserReq.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "users.http.processDemoteToUserReq.ShouldBindUri: %v", err)
 		return demoteToUserReq{}, errWrongQuery
 	}
 

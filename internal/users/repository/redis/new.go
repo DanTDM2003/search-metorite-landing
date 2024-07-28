@@ -11,8 +11,11 @@ type impleRedisRepository struct {
 	redis *pkgRedis.RedisClient
 }
 
-func New(l pkgLog.Logger, redis *pkgRedis.RedisClient) repository.RedisRepository {
-	return impleRedisRepository{
+func New(
+	l pkgLog.Logger,
+	redis *pkgRedis.RedisClient,
+) repository.RedisRepository {
+	return &impleRedisRepository{
 		l:     l,
 		redis: redis,
 	}

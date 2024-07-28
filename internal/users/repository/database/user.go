@@ -53,7 +53,7 @@ func (repo impleRepository) GetOneUser(ctx context.Context, opt repository.GetOn
 	cond, params := repo.buildGetOneUserCondition(opt)
 
 	var user models.User
-	if err := table.First(&user, cond, params).Error; err != nil {
+	if err := table.Where(cond, params).First(&user).Error; err != nil {
 		repo.l.Errorf(ctx, "users.repository.database.GetOneUser.db.First: %v", err)
 		return models.User{}, err
 	}
@@ -100,7 +100,7 @@ func (repo impleRepository) UpdateUser(ctx context.Context, opt repository.Updat
 func (repo impleRepository) DeleteUser(ctx context.Context, id uint) error {
 	table := repo.getTable()
 
-	if err := table.Delete(&models.User{}, "id = ?", id).Error; err != nil {
+	if err := table.Where("id = ?", id).Delete(&models.User{}).Error; err != nil {
 		repo.l.Errorf(ctx, "users.repository.database.DeleteUser.db.Delete: %v", err)
 		return err
 	}

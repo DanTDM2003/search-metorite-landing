@@ -11,7 +11,7 @@ func (h handler) GetUsers(c *gin.Context) {
 
 	req, pagQuery, err := h.processGetUsersReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.GetUsers.processGetUsersReq: %v", err)
+		h.l.Warnf(ctx, "users.http.GetUsers.processGetUsersReq: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -23,7 +23,7 @@ func (h handler) GetUsers(c *gin.Context) {
 		PaginatorQuery: pagQuery,
 	})
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetUsers.uc.GetUsers: %v", err)
+		h.l.Errorf(ctx, "users.http.GetUsers.uc.GetUsers: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -36,7 +36,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 
 	req, err := h.processGetOneUserReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.GetOneUser.processGetOneUserReq: %v", err)
+		h.l.Warnf(ctx, "users.http.GetOneUser.processGetOneUserReq: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -45,7 +45,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 		ID: req.ID,
 	})
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetOneUser.uc.GetOneUser: %v", err)
+		h.l.Errorf(ctx, "users.http.GetOneUser.uc.GetOneUser: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -59,14 +59,14 @@ func (h handler) CreateUser(c *gin.Context) {
 
 	req, err := h.processCreateUserReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.CreateUser.processCreateUserReq: %v", err)
+		h.l.Warnf(ctx, "users.http.CreateUser.processCreateUserReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	u, err := h.uc.CreateUser(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.CreateUser.uc.CreateUser: %v", err)
+		h.l.Errorf(ctx, "users.http.CreateUser.uc.CreateUser: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -80,14 +80,14 @@ func (h handler) UpdateUser(c *gin.Context) {
 
 	req, err := h.processUpdateUserReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.UpdateUser.processUpdateUserReq: %v", err)
+		h.l.Warnf(ctx, "users.http.UpdateUser.processUpdateUserReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	u, err := h.uc.UpdateUser(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateUser.uc.UpdateUser: %v", err)
+		h.l.Errorf(ctx, "users.http.UpdateUser.uc.UpdateUser: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -101,14 +101,14 @@ func (h handler) DeleteUser(c *gin.Context) {
 
 	req, err := h.processDeleteUserReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.DeleteUser.processDeleteUserReq: %v", err)
+		h.l.Warnf(ctx, "users.http.DeleteUser.processDeleteUserReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	err = h.uc.DeleteUser(ctx, req.ID)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.DeleteUser.uc.DeleteUser: %v", err)
+		h.l.Errorf(ctx, "users.http.DeleteUser.uc.DeleteUser: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -122,14 +122,14 @@ func (h handler) SignIn(c *gin.Context) {
 
 	req, err := h.processSignInReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.SignIn.processSignInReq: %v", err)
+		h.l.Warnf(ctx, "users.http.SignIn.processSignInReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	o, err := h.uc.SignIn(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.SignIn.uc.SignIn: %v", err)
+		h.l.Errorf(ctx, "users.http.SignIn.uc.SignIn: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -143,14 +143,14 @@ func (h handler) SignUp(c *gin.Context) {
 
 	req, err := h.processSignUpReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.SignUp.processSignUpReq: %v", err)
+		h.l.Warnf(ctx, "users.http.SignUp.processSignUpReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	u, err := h.uc.SignUp(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.SignUp.uc.SignUp: %v", err)
+		h.l.Errorf(ctx, "users.http.SignUp.uc.SignUp: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -164,14 +164,14 @@ func (h handler) PromoteToAdmin(c *gin.Context) {
 
 	req, err := h.processPromoteToAdminReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.PromoteToAdmin.processPromoteToAdminReq: %v", err)
+		h.l.Warnf(ctx, "users.http.PromoteToAdmin.processPromoteToAdminReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	u, err := h.uc.PromoteToAdmin(ctx, req.ID)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.PromoteToAdmin.uc.PromoteToAdmin: %v", err)
+		h.l.Errorf(ctx, "users.http.PromoteToAdmin.uc.PromoteToAdmin: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -185,14 +185,14 @@ func (h handler) DemoteToUser(c *gin.Context) {
 
 	req, err := h.processDemoteToUserReq(c)
 	if err != nil {
-		h.l.Warnf(ctx, "http.handler.DemoteToUser.processDemoteToUserReq: %v", err)
+		h.l.Warnf(ctx, "users.http.DemoteToUser.processDemoteToUserReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	u, err := h.uc.DemoteToUser(ctx, req.ID)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.DemoteToUser.uc.DemoteToUser: %v", err)
+		h.l.Errorf(ctx, "users.http.DemoteToUser.uc.DemoteToUser: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return

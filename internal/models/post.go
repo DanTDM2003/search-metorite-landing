@@ -11,8 +11,8 @@ type Post struct {
 	AuthorID  uint           `json:"author_id" gorm:"index"`
 	Title     string         `json:"title"`
 	Content   string         `json:"content"`
-	ViewCount float64        `json:"view_count"`
-	Rating    int            `json:"rating"`
+	ViewCount uint           `json:"view_count"`
+	Rating    float64        `json:"rating"`
 	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`

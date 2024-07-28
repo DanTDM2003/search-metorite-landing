@@ -5,5 +5,6 @@ import (
 )
 
 var (
-	ErrDuplicatedKeyCode = pq.ErrorCode("23505")
+	ErrDuplicatedKeyCode   = pq.ErrorCode("23505")
+	ErrForeignKeyViolation = pq.ErrorCode("23503")
 )

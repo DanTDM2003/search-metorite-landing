@@ -10,7 +10,7 @@ func (h handler) processGetMeteoriteLandingsReq(c *gin.Context) (paginator.Pagin
 
 	var pagQuery paginator.PaginatorQuery
 	if err := c.ShouldBindQuery(&pagQuery); err != nil {
-		h.l.Warnf(ctx, "http.handler.GetMeteoriteLandings.ShouldBindQuery: %v", errWrongQuery)
+		h.l.Warnf(ctx, "meteorite_landings.http.processGetMeteoriteLandingsReq.ShouldBindQuery: %v", errWrongQuery)
 		return paginator.PaginatorQuery{}, errWrongQuery
 	}
 
@@ -19,63 +19,63 @@ func (h handler) processGetMeteoriteLandingsReq(c *gin.Context) (paginator.Pagin
 	return pagQuery, nil
 }
 
-func (h handler) processGetOneMeteoriteLandingsReq(c *gin.Context) (getOneMeteoriteLandingReq, error) {
+func (h handler) processGetOneMeteoriteLandingReq(c *gin.Context) (getOneMeteoriteLandingReq, error) {
 	ctx := c.Request.Context()
 
 	var req getOneMeteoriteLandingReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.GetOneMeteoriteLanding.ShouldBindUri: %v", errWrongQuery)
+		h.l.Warnf(ctx, "meteorite_landings.http.processGetOneMeteoriteLandingReq.ShouldBindUri: %v", errWrongQuery)
 		return getOneMeteoriteLandingReq{}, errWrongQuery
 	}
 
 	return req, nil
 }
 
-func (h handler) processCreateMeteoriteLanding(c *gin.Context) (createMeteoriteLandingReq, error) {
+func (h handler) processCreateMeteoriteLandingReq(c *gin.Context) (createMeteoriteLandingReq, error) {
 	ctx := c.Request.Context()
 
 	var req createMeteoriteLandingReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.CreateMeteoriteLanding.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processCreateMeteoriteLandingReq.ShouldBindJSON: %v", err)
 		return createMeteoriteLandingReq{}, errWrongQuery
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.CreateMeteoriteLanding.validate: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processCreateMeteoriteLandingReq.validate: %v", err)
 		return createMeteoriteLandingReq{}, err
 	}
 
 	return req, nil
 }
 
-func (h handler) processUpdateMeteoriteLanding(c *gin.Context) (updateMeteoriteLandingReq, error) {
+func (h handler) processUpdateMeteoriteLandingReq(c *gin.Context) (updateMeteoriteLandingReq, error) {
 	ctx := c.Request.Context()
 
 	var req updateMeteoriteLandingReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.UpdateMeteoriteLanding.ShouldBindJSON: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processUpdateMeteoriteLandingReq.ShouldBindJSON: %v", err)
 		return updateMeteoriteLandingReq{}, errWrongQuery
 	}
 
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.UpdateMeteoriteLanding.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processUpdateMeteoriteLandingReq.ShouldBindUri: %v", err)
 		return updateMeteoriteLandingReq{}, errWrongQuery
 	}
 
 	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "http.handler.UpdateMeteoriteLanding.validate: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processUpdateMeteoriteLandingReq.validate: %v", err)
 		return updateMeteoriteLandingReq{}, err
 	}
 
 	return req, nil
 }
 
-func (h handler) processDeleteMeteoriteLanding(c *gin.Context) (deleteMeteoriteLandingReq, error) {
+func (h handler) processDeleteMeteoriteLandingReq(c *gin.Context) (deleteMeteoriteLandingReq, error) {
 	ctx := c.Request.Context()
 
 	var req deleteMeteoriteLandingReq
 	if err := c.ShouldBindUri(&req); err != nil {
-		h.l.Warnf(ctx, "http.handler.DeleteMeteoriteLanding.ShouldBindUri: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.processDeleteMeteoriteLandingReq.ShouldBindUri: %v", err)
 		return deleteMeteoriteLandingReq{}, errWrongQuery
 	}
 

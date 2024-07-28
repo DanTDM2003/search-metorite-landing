@@ -11,14 +11,14 @@ import (
 func (redisRepo impleRedisRepository) SetMeteoriteLanding(ctx context.Context, mL models.MeteoriteLanding) error {
 	val, err := json.Marshal(mL)
 	if err != nil {
-		redisRepo.l.Errorf(ctx, "redis.repository.SetMeteoriteLanding.json.Marshal: %v", err)
+		redisRepo.l.Errorf(ctx, "meteorite_landings.repository.redis.SetMeteoriteLanding.json.Marshal: %v", err)
 		return err
 	}
 
 	key := fmt.Sprintf("meteorite_landing:%d", mL.ID)
 	err = redisRepo.redis.Set(ctx, key, val)
 	if err != nil {
-		redisRepo.l.Errorf(ctx, "redis.repository.GetMeteoriteLanding.redis.Set: %v", err)
+		redisRepo.l.Errorf(ctx, "meteorite_landings.repository.redis.GetMeteoriteLanding.redis.Set: %v", err)
 		return err
 	}
 
@@ -29,14 +29,14 @@ func (redisRepo impleRedisRepository) GetMeteoriteLanding(ctx context.Context, i
 	key := fmt.Sprintf("meteorite_landing:%d", id)
 	val, err := redisRepo.redis.Get(ctx, key)
 	if err != nil {
-		redisRepo.l.Errorf(ctx, "redis.repository.GetMeteoriteLanding.redis.Get: %v", err)
+		redisRepo.l.Errorf(ctx, "meteorite_landings.repository.redis.GetMeteoriteLanding.redis.Get: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
 
 	var mL models.MeteoriteLanding
 	err = json.Unmarshal([]byte(val), &mL)
 	if err != nil {
-		redisRepo.l.Errorf(ctx, "redis.repository.GetMeteoriteLanding.json.Unmarshal: %v", err)
+		redisRepo.l.Errorf(ctx, "meteorite_landings.repository.redis.GetMeteoriteLanding.json.Unmarshal: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
 
@@ -47,7 +47,7 @@ func (redisRepo impleRedisRepository) DeleteMeteoriteLanding(ctx context.Context
 	key := fmt.Sprintf("meteorite_landing:%d", id)
 	err := redisRepo.redis.Del(ctx, key)
 	if err != nil {
-		redisRepo.l.Errorf(ctx, "redis.repository.DeleteMeteoriteLanding.redis.Del: %v", err)
+		redisRepo.l.Errorf(ctx, "meteorite_landings.repository.redis.DeleteMeteoriteLanding.redis.Del: %v", err)
 		return err
 	}
 

@@ -22,7 +22,11 @@ type impleUsecase struct {
 	redis repository.RedisRepository
 }
 
-func New(l pkgLog.Logger, repo repository.Repository, redisRepo repository.RedisRepository) Usecase {
+func New(
+	l pkgLog.Logger,
+	repo repository.Repository,
+	redisRepo repository.RedisRepository,
+) Usecase {
 	return &impleUsecase{
 		l:     l,
 		repo:  repo,

@@ -11,7 +11,7 @@ func (h handler) GetMeteoriteLandings(c *gin.Context) {
 
 	pagQuery, err := h.processGetMeteoriteLandingsReq(c)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetMeteoriteLandings.processGetMeteoriteLandingsReq: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.GetMeteoriteLandings.processGetMeteoriteLandingsReq: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -20,7 +20,7 @@ func (h handler) GetMeteoriteLandings(c *gin.Context) {
 		PaginatorQuery: pagQuery,
 	})
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetMeteoriteLandings.uc.GetMeteoriteLandings: %v", err)
+		h.l.Errorf(ctx, "meteorite_landings.http.GetMeteoriteLandings.uc.GetMeteoriteLandings: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -32,9 +32,9 @@ func (h handler) GetMeteoriteLandings(c *gin.Context) {
 func (h handler) GetOneMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	req, err := h.processGetOneMeteoriteLandingsReq(c)
+	req, err := h.processGetOneMeteoriteLandingReq(c)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetOneMeteoriteLanding.processGetOneMeteoriteLandingsReq: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.GetOneMeteoriteLanding.processGetOneMeteoriteLandingReq: %v", err)
 		response.Error(c, err)
 		return
 	}
@@ -43,7 +43,7 @@ func (h handler) GetOneMeteoriteLanding(c *gin.Context) {
 		ID: req.ID,
 	})
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.GetOneMeteoriteLanding.uc.GetOneMeteoriteLanding: %v", err)
+		h.l.Errorf(ctx, "meteorite_landings.http.GetOneMeteoriteLanding.uc.GetOneMeteoriteLanding: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -55,16 +55,16 @@ func (h handler) GetOneMeteoriteLanding(c *gin.Context) {
 func (h handler) CreateMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	req, err := h.processCreateMeteoriteLanding(c)
+	req, err := h.processCreateMeteoriteLandingReq(c)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.CreateMeteoriteLanding.processCreateMeteoriteLanding: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.CreateMeteoriteLanding.processCreateMeteoriteLandingReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	mL, err := h.uc.CreateMeteoriteLanding(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.CreateMeteoriteLanding.uc.CreateMeteoriteLanding: %v", err)
+		h.l.Errorf(ctx, "meteorite_landings.http.CreateMeteoriteLanding.uc.CreateMeteoriteLanding: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -76,16 +76,16 @@ func (h handler) CreateMeteoriteLanding(c *gin.Context) {
 func (h handler) UpdateMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	req, err := h.processUpdateMeteoriteLanding(c)
+	req, err := h.processUpdateMeteoriteLandingReq(c)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateMeteoriteLanding.processUpdateMeteoriteLanding: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.UpdateMeteoriteLanding.processUpdateMeteoriteLandingReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	mL, err := h.uc.UpdateMeteoriteLanding(ctx, req.toInput())
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.UpdateMeteoriteLanding.uc.UpdateMeteoriteLanding: %v", err)
+		h.l.Errorf(ctx, "meteorite_landings.http.UpdateMeteoriteLanding.uc.UpdateMeteoriteLanding: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return
@@ -97,16 +97,16 @@ func (h handler) UpdateMeteoriteLanding(c *gin.Context) {
 func (h handler) DeleteMeteoriteLanding(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	req, err := h.processDeleteMeteoriteLanding(c)
+	req, err := h.processDeleteMeteoriteLandingReq(c)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.processDeleteMeteoriteLanding: %v", err)
+		h.l.Warnf(ctx, "meteorite_landings.http.DeleteMeteoriteLanding.processDeleteMeteoriteLandingReq: %v", err)
 		response.Error(c, err)
 		return
 	}
 
 	err = h.uc.DeleteMeteoriteLanding(ctx, req.ID)
 	if err != nil {
-		h.l.Errorf(ctx, "http.handler.DeleteMeteoriteLanding.uc.DeleteMeteoriteLanding: %v", err)
+		h.l.Errorf(ctx, "meteorite_landings.http.DeleteMeteoriteLanding.uc.DeleteMeteoriteLanding: %v", err)
 		mapErr := h.mapError(err)
 		response.Error(c, mapErr)
 		return

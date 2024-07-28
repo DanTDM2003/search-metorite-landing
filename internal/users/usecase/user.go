@@ -30,7 +30,7 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 	user, err := uc.redisRepo.GetUser(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
+			user, err = uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
 				ID: input.ID,
 			})
 			if err != nil {
@@ -46,8 +46,6 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 				uc.l.Errorf(ctx, "users.usecase.GetUser.redis.SetUser: %v", err)
 				return models.User{}, err
 			}
-
-			return user, nil
 		}
 		uc.l.Errorf(ctx, "users.usecase.GetUser.redis.GetUser: %v", err)
 		return models.User{}, err

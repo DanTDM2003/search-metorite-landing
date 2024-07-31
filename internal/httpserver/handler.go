@@ -9,7 +9,7 @@ import (
 	mLDB "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/database"
 	mLRedis "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/repository/redis"
 	mLUC "github.com/DanTDM2003/search-api-docker-redis/internal/meteorite_landings/usecase"
-	middlware "github.com/DanTDM2003/search-api-docker-redis/internal/middleware"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/middleware"
 	postHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/posts/delivery/http"
 	postDB "github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository/database"
 	postRedis "github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository/redis"
@@ -18,10 +18,15 @@ import (
 	userDB "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/database"
 	userRedis "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/redis"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 )
 
 func (srv HTTPServer) mapHandlers() error {
-	srv.gin.Use(middlware.Recovery())
+	srv.gin.Use(middleware.Recovery())
+
+	jwtManager := pkgJWT.New(srv.secretKey, srv.database)
+
+	middlewares := middleware.New(srv.l, jwtManager)
 
 	meteoriteLandingRepo := mLDB.New(srv.l, srv.database)
 	meteoriteLandingRedisRepo := mLRedis.New(srv.l, srv.redis)
@@ -44,9 +49,9 @@ func (srv HTTPServer) mapHandlers() error {
 	articleH := articleHTTP.New(srv.l, articleUC)
 
 	api := srv.gin.Group("api/v1")
-	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH)
-	userHTTP.MapUserRoutes(api.Group("users"), userH)
-	postHTTP.MapPostRoutes(api.Group("posts"), postH)
+	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH, middlewares)
+	userHTTP.MapUserRoutes(api.Group("users"), userH, middlewares)
+	postHTTP.MapPostRoutes(api.Group("posts"), postH, middlewares)
 	articleHTTP.MapArticleRoutes(api.Group("articles"), articleH)
 
 	return nil

@@ -3,7 +3,7 @@ package response
 import (
 	"net/http"
 
-	"github.com/DanTDM2003/search-api-docker-redis/pkg/errors"
+	pkgErrors "github.com/DanTDM2003/search-api-docker-redis/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ func Success(c *gin.Context, data any) {
 
 func parseError(err error) (int, Resp) {
 	switch parsedErr := err.(type) {
-	case errors.HTTPError:
+	case pkgErrors.HTTPError:
 		statusCode := parsedErr.StatusCode
 
 		if statusCode == 0 {
@@ -52,4 +52,8 @@ func PanicError(c *gin.Context, err any) {
 	} else {
 		c.JSON(parseError(err.(error)))
 	}
+}
+
+func Unauthorized(c *gin.Context) {
+	c.JSON(parseError(pkgErrors.NewUnauthorizedHTTPError()))
 }

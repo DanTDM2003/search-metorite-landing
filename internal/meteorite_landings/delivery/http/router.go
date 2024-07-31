@@ -1,9 +1,12 @@
 package http
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/DanTDM2003/search-api-docker-redis/internal/middleware"
+	"github.com/gin-gonic/gin"
+)
 
-func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler) {
-	r.Use()
+func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
+	r.Use(m.Auth())
 	r.GET("", h.GetMeteoriteLandings)
 	r.GET("/:id", h.GetOneMeteoriteLanding)
 	r.POST("", h.CreateMeteoriteLanding)

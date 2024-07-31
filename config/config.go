@@ -7,6 +7,7 @@ type Config struct {
 	Logger     LoggerConfig
 	Postgres   PostgresConfig
 	Redis      RedisConfig
+	JWT        JWTConfig
 }
 
 type HTTPServerConfig struct {
@@ -33,6 +34,10 @@ type RedisConfig struct {
 	Addr     string `env:"REDIS_ADDRESS" envDefault:"localhost"`
 	Password string `env:"REDIS_PASSWORD" envDefault:""`
 	DB       int    `env:"REDIS_DB" envDefault:"0"`
+}
+
+type JWTConfig struct {
+	SecretKey string `env:"SECRET_KEY" envDefault:"secret"`
 }
 
 func Load() (*Config, error) {

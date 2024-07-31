@@ -1,12 +1,20 @@
 package http
 
 import (
+	pkgErrors "github.com/DanTDM2003/search-api-docker-redis/pkg/errors"
+	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
 	"github.com/gin-gonic/gin"
 )
 
 func (h handler) processGetUsersReq(c *gin.Context) (getUsersReq, paginator.PaginatorQuery, error) {
 	ctx := c.Request.Context()
+
+	_, ok := pkgJWT.GetPayloadFromContext(ctx)
+	if !ok {
+		h.l.Warnf(ctx, "users.http.processGetUsersReq.ShouldBindQuery: %v", pkgErrors.NewUnauthorizedHTTPError())
+		return getUsersReq{}, paginator.PaginatorQuery{}, pkgErrors.NewUnauthorizedHTTPError()
+	}
 
 	var req getUsersReq
 	if err := c.ShouldBindQuery(&req); err != nil {

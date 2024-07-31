@@ -12,14 +12,14 @@ import (
 type MeteoriteLanding struct {
 	gorm.Model
 	ID          uint           `json:"id" gorm:"primaryKey"`
-	Year        time.Time      `json:"year"`
+	Year        time.Time      `json:"year" gorm:"not null"`
 	Name        string         `json:"name" gorm:"unique"`
-	NameType    string         `json:"name_type"`
-	Recclass    string         `json:"recclass"`
-	Mass        float64        `json:"mass"`
-	Fall        string         `json:"fall"`
-	Reclat      float64        `json:"reclat"`
-	Reclong     float64        `json:"reclong"`
+	NameType    string         `json:"name_type" gorm:"not null"`
+	Recclass    string         `json:"recclass" gorm:"not null"`
+	Mass        float64        `json:"mass" gorm:"not null"`
+	Fall        string         `json:"fall" gorm:"not null"`
+	Reclat      float64        `json:"reclat" gorm:"not null"`
+	Reclong     float64        `json:"reclong" gorm:"not null"`
 	GeoLocation GeoLocation    `json:"geo_location" gorm:"type:jsonb"`
 	CreatedAt   time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time      `json:"updated_at" gorm:"autoUpdateTime"`

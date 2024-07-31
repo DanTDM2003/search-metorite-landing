@@ -22,7 +22,7 @@ func migrateUsers(db *gorm.DB, table interface{}) error {
 	admin := models.User{
 		ID:       1,
 		Username: "John Doe",
-		Email:    "",
+		Email:    "admin@gmail.com",
 		Password: hashedPassword,
 		Role:     "superadmin",
 	}

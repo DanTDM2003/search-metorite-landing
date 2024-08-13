@@ -16,12 +16,12 @@ type Handler interface {
 
 type handler struct {
 	l  pkgLog.Logger
-	uc usecase.UseCase
+	uc usecase.Usecase
 }
 
 func New(
 	l pkgLog.Logger,
-	uc usecase.UseCase,
+	uc usecase.Usecase,
 ) Handler {
 	return &handler{
 		l:  l,

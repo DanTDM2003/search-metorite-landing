@@ -3,10 +3,14 @@ package usecase
 import (
 	"context"
 	"errors"
+	"strconv"
+	"time"
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
+	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
+	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -30,7 +34,7 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 	user, err := uc.redisRepo.GetUser(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			user, err = uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
+			user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
 				ID: input.ID,
 			})
 			if err != nil {
@@ -46,6 +50,7 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 				uc.l.Errorf(ctx, "users.usecase.GetUser.redis.SetUser: %v", err)
 				return models.User{}, err
 			}
+			return user, nil
 		}
 		uc.l.Errorf(ctx, "users.usecase.GetUser.redis.GetUser: %v", err)
 		return models.User{}, err
@@ -144,13 +149,26 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 		return SignInOutput{}, err
 	}
 
+	token, err := uc.jwtManager.GenerateAccessToken(pkgJWT.Payload{
+		StandardClaims: jwt.StandardClaims{
+			Subject:   strconv.Itoa(int(user.ID)),
+			ExpiresAt: jwt.TimeFunc().Add(15 * time.Minute).Unix(),
+		},
+		Role: user.Role,
+	})
+	if err != nil {
+		uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GenerateAccessToken: %v", err)
+		return SignInOutput{}, err
+	}
+
 	if ok := utils.CheckPasswordHash(input.Password, user.Password); !ok {
 		uc.l.Warnf(ctx, "users.usecase.SignIn.user.ComparePassword: %v", err)
 		return SignInOutput{}, ErrWrongPassword
 	}
 
 	return SignInOutput{
-		User: user,
+		User:  user,
+		Token: token,
 	}, nil
 }
 

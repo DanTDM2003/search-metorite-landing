@@ -1,6 +1,8 @@
 package httpserver
 
 import (
+	"fmt"
+
 	articleHTTP "github.com/DanTDM2003/search-api-docker-redis/internal/articles/delivery/http"
 	articleDB "github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository/database"
 	articleRedis "github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository/redis"
@@ -19,6 +21,7 @@ import (
 	userRedis "github.com/DanTDM2003/search-api-docker-redis/internal/users/repository/redis"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
+	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 )
 
 func (srv HTTPServer) mapHandlers() error {
@@ -26,7 +29,15 @@ func (srv HTTPServer) mapHandlers() error {
 
 	jwtManager := pkgJWT.New(srv.secretKey, srv.database)
 
-	middlewares := middleware.New(srv.l, jwtManager)
+	// token, _ := jwtManager.GenerateAccessToken(pkgJWT.Payload{
+	// 	StandardClaims: jwt.StandardClaims{
+	// 		Subject: "1",
+	// 	},
+	// })
+	// fmt.Println(token)
+
+	password, err := utils.HashPassword("D@nTDM22122003")
+	fmt.Println(password, err)
 
 	meteoriteLandingRepo := mLDB.New(srv.l, srv.database)
 	meteoriteLandingRedisRepo := mLRedis.New(srv.l, srv.redis)
@@ -35,7 +46,7 @@ func (srv HTTPServer) mapHandlers() error {
 
 	userRepo := userDB.New(srv.l, srv.database)
 	userRedisRepo := userRedis.New(srv.l, srv.redis)
-	userUC := userUC.New(srv.l, userRepo, userRedisRepo)
+	userUC := userUC.New(srv.l, userRepo, userRedisRepo, jwtManager)
 	userH := userHTTP.New(srv.l, userUC)
 
 	postRepo := postDB.New(srv.l, srv.database)
@@ -48,10 +59,12 @@ func (srv HTTPServer) mapHandlers() error {
 	articleUC := articleUC.New(srv.l, articleRepo, articleRedisRepo)
 	articleH := articleHTTP.New(srv.l, articleUC)
 
+	mw := middleware.New(srv.l, jwtManager, userUC)
+
 	api := srv.gin.Group("api/v1")
-	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH, middlewares)
-	userHTTP.MapUserRoutes(api.Group("users"), userH, middlewares)
-	postHTTP.MapPostRoutes(api.Group("posts"), postH, middlewares)
+	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH, mw)
+	userHTTP.MapUserRoutes(api.Group("users"), userH, mw)
+	postHTTP.MapPostRoutes(api.Group("posts"), postH, mw)
 	articleHTTP.MapArticleRoutes(api.Group("articles"), articleH)
 
 	return nil

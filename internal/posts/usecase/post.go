@@ -32,7 +32,7 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 	post, err := uc.redisRepo.GetPost(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			post, err = uc.repo.GetOnePost(ctx, repository.GetOnePostOptions{
+			post, err := uc.repo.GetOnePost(ctx, repository.GetOnePostOptions{
 				ID:       input.ID,
 				AuthorID: input.AuthorID,
 			})
@@ -48,6 +48,7 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 			if err := uc.redisRepo.SetPost(ctx, post); err != nil {
 				uc.l.Errorf(ctx, "posts.usecase.GetOnePost.redisRepo.SetPost: %v", err)
 			}
+			return post, nil
 		} else {
 			uc.l.Errorf(ctx, "posts.usecase.GetOnePost.redisRepo.GetPost: %v", err)
 			return models.Post{}, err

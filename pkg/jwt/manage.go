@@ -63,12 +63,12 @@ func (manager impleManager) VerifyAccessToken(token string) (Payload, error) {
 		return []byte(manager.secretKey), nil
 	})
 	if err != nil {
-		log.Fatalf("failed to parse access token: %v", err)
+		log.Printf("failed to parse access token: %v", err)
 		return Payload{}, err
 	}
 
 	if !jwtToken.Valid {
-		log.Fatalf("invalid access token: %v", ErrInvalidToken)
+		log.Printf("invalid access token: %v", ErrInvalidToken)
 		return Payload{}, ErrInvalidToken
 	}
 
@@ -81,18 +81,18 @@ func (manager impleManager) VerifyRefreshToken(token string) (int, error) {
 		return []byte(manager.secretKey), nil
 	})
 	if err != nil {
-		log.Fatalf("failed to parse refresh token: %v", err)
+		log.Printf("failed to parse refresh token: %v", err)
 		return 0, err
 	}
 
 	if !jwtToken.Valid {
-		log.Fatalf("invalid refresh token: %v", ErrInvalidToken)
+		log.Printf("invalid refresh token: %v", ErrInvalidToken)
 		return 0, ErrInvalidToken
 	}
 
 	userID, err := strconv.Atoi(claims.Subject)
 	if err != nil {
-		log.Fatalf("failed to convert subject to int: %v", err)
+		log.Printf("failed to convert subject to int: %v", err)
 		return 0, err
 	}
 

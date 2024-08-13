@@ -1,39 +1,43 @@
 package middleware
 
 import (
-	"strings"
+	"strconv"
 
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
 )
 
-func (m Middleware) Auth() gin.HandlerFunc {
+func (m Middleware) UserSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := strings.ReplaceAll(c.GetHeader("Authorization"), "Bearer ", "")
-		if token == "" {
+		ctx := c.Request.Context()
+		payload, ok := pkgJWT.GetPayloadFromContext(ctx)
+		if !ok {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
 
-		claims, err := m.jwtManager.VerifyAccessToken(token)
+		sessUserID, err := strconv.Atoi(payload.StandardClaims.Subject)
 		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
 
-		if claims.Refresh {
+		sessUser, err := m.userUC.GetOneUser(ctx, usecase.GetOneUserInput{
+			ID: uint(sessUserID),
+		})
+		if err != nil {
 			response.Unauthorized(c)
 			c.Abort()
 			return
 		}
 
-		ctx := c.Request.Context()
-		ctx = pkgJWT.SetPayloadToContext(ctx, claims)
-
+		ctx = pkgJWT.SetUserToContext(ctx, sessUser)
 		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

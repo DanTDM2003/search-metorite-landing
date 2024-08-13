@@ -14,7 +14,7 @@ func migrateUsers(db *gorm.DB, table interface{}) error {
 		log.Fatalf("failed to auto migrate table: %v", err)
 	}
 
-	hashedPassword, err := utils.HashPassword("DanTDM2003")
+	hashedPassword, err := utils.HashPassword("DanTDM22122003")
 	if err != nil {
 		log.Fatalf("failed to hash password: %v", err)
 	}

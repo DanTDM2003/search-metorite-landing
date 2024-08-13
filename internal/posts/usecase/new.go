@@ -8,7 +8,7 @@ import (
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
 
-type UseCase interface {
+type Usecase interface {
 	GetPosts(ctx context.Context, input GetPostsInput) (GetPostsOutput, error)
 	GetOnePost(ctx context.Context, input GetOnePostInput) (models.Post, error)
 	CreatePost(ctx context.Context, input CreatePostInput) (models.Post, error)
@@ -26,7 +26,7 @@ func New(
 	l pkgLog.Logger,
 	repo repository.Repository,
 	redisRepo repository.RedisRepository,
-) UseCase {
+) Usecase {
 	return &impleUsecase{
 		l:         l,
 		repo:      repo,

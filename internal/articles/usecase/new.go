@@ -5,10 +5,10 @@ import (
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
 
-type UseCase interface {
+type Usecase interface {
 }
 
-type impleUseCase struct {
+type impleUsecase struct {
 	l     pkgLog.Logger
 	repo  repository.Repository
 	redis repository.RedisRepository
@@ -18,8 +18,8 @@ func New(
 	l pkgLog.Logger,
 	repo repository.Repository,
 	redis repository.RedisRepository,
-) UseCase {
-	return &impleUseCase{
+) Usecase {
+	return &impleUsecase{
 		l:     l,
 		repo:  repo,
 		redis: redis,

@@ -96,40 +96,6 @@ func (h handler) processDeleteUserReq(c *gin.Context) (deleteUserReq, error) {
 	return req, nil
 }
 
-func (h handler) processSignInReq(c *gin.Context) (signInReq, error) {
-	ctx := c.Request.Context()
-
-	var req signInReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "users.http.processSignInReq.ShouldBindJSON: %v", err)
-		return signInReq{}, errWrongBody
-	}
-
-	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "users.http.processSignInReq.validate: %v", err)
-		return signInReq{}, err
-	}
-
-	return req, nil
-}
-
-func (h handler) processSignUpReq(c *gin.Context) (signUpReq, error) {
-	ctx := c.Request.Context()
-
-	var req signUpReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		h.l.Warnf(ctx, "users.http.processSignUpReq.ShouldBindJSON: %v", err)
-		return signUpReq{}, errWrongBody
-	}
-
-	if err := req.validate(); err != nil {
-		h.l.Warnf(ctx, "users.http.processSignUpReq.validate: %v", err)
-		return signUpReq{}, err
-	}
-
-	return req, nil
-}
-
 func (h handler) processPromoteToAdminReq(c *gin.Context) (promoteToAdminReq, error) {
 	ctx := c.Request.Context()
 
@@ -149,6 +115,28 @@ func (h handler) processDemoteToUserReq(c *gin.Context) (demoteToUserReq, error)
 	if err := c.ShouldBindUri(&req); err != nil {
 		h.l.Warnf(ctx, "users.http.processDemoteToUserReq.ShouldBindUri: %v", err)
 		return demoteToUserReq{}, errWrongQuery
+	}
+
+	return req, nil
+}
+
+func (h handler) processChangePasswordReq(c *gin.Context) (changePasswordReq, error) {
+	ctx := c.Request.Context()
+
+	var req changePasswordReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		h.l.Warnf(ctx, "users.http.processChangePasswordReq.ShouldBindJSON: %v", err)
+		return changePasswordReq{}, errWrongBody
+	}
+
+	if err := c.ShouldBindUri(&req); err != nil {
+		h.l.Warnf(ctx, "users.http.processChangePasswordReq.ShouldBindUri: %v", err)
+		return changePasswordReq{}, errWrongQuery
+	}
+
+	if err := req.validate(); err != nil {
+		h.l.Warnf(ctx, "users.http.processChangePasswordReq.validate: %v", err)
+		return changePasswordReq{}, err
 	}
 
 	return req, nil

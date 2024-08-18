@@ -79,9 +79,9 @@ func (h handler) NewGetOnePostResp(post models.Post) getOnePostResp {
 }
 
 type createPostReq struct {
-	AuthorID uint   `json:"author_id"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
+	AuthorID uint   `json:"author_id" binding:"required"`
+	Title    string `json:"title" binding:"required"`
+	Content  string `json:"content" binding:"required"`
 }
 
 type createPostResp struct {

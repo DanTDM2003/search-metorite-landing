@@ -144,7 +144,6 @@ func (req updateUserReq) toInput() usecase.UpdateUserInput {
 		ID:       req.ID,
 		Username: req.Username,
 		Email:    req.Email,
-		Password: req.Password,
 	}
 }
 
@@ -170,103 +169,6 @@ func (h handler) newUpdateUserResp(user models.User) updateUserResp {
 
 type deleteUserReq struct {
 	ID uint `uri:"id"`
-}
-
-type signInReq struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-func (req signInReq) validate() error {
-	if err := utils.ValidatePassword(req.Password); err != nil {
-		return errInvalidPassword
-	}
-
-	if err := utils.ValidateEmail(req.Email); err != nil {
-		return errInvalidEmail
-	}
-
-	return nil
-}
-
-func (req signInReq) toInput() usecase.SignInInput {
-	return usecase.SignInInput{
-		Email:    req.Email,
-		Password: req.Password,
-	}
-}
-
-type user struct {
-	ID        uint              `json:"id"`
-	Username  string            `json:"username"`
-	Email     string            `json:"email"`
-	Role      string            `json:"role"`
-	CreatedAt response.DateTime `json:"created_at"`
-	UpdatedAt response.DateTime `json:"updated_at"`
-}
-
-type signInResp struct {
-	Token string `json:"token"`
-	User  user   `json:"user"`
-}
-
-func (h handler) newSignInResp(o usecase.SignInOutput) signInResp {
-	return signInResp{
-		Token: o.Token,
-		User: user{
-			ID:        o.User.ID,
-			Username:  o.User.Username,
-			Email:     o.User.Email,
-			Role:      o.User.Role,
-			CreatedAt: response.DateTime(o.User.CreatedAt),
-			UpdatedAt: response.DateTime(o.User.UpdatedAt),
-		},
-	}
-}
-
-type signUpReq struct {
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-func (req signUpReq) validate() error {
-	if err := utils.ValidatePassword(req.Password); err != nil {
-		return errInvalidPassword
-	}
-
-	if err := utils.ValidateEmail(req.Email); err != nil {
-		return errInvalidEmail
-	}
-
-	return nil
-}
-
-func (req signUpReq) toInput() usecase.SignUpInput {
-	return usecase.SignUpInput{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-	}
-}
-
-type signUpResp struct {
-	Token string `json:"token"`
-	User  user   `json:"user"`
-}
-
-func (h handler) newSignUpResp(o usecase.SignUpOutput) signUpResp {
-	return signUpResp{
-		Token: o.Token,
-		User: user{
-			ID:        o.User.ID,
-			Username:  o.User.Username,
-			Email:     o.User.Email,
-			Role:      o.User.Role,
-			CreatedAt: response.DateTime(o.User.CreatedAt),
-			UpdatedAt: response.DateTime(o.User.UpdatedAt),
-		},
-	}
 }
 
 type promoteToAdminReq struct {
@@ -314,5 +216,27 @@ func (h handler) newDemoteToUserResp(user models.User) demoteToUserResp {
 		Role:      user.Role,
 		CreatedAt: response.DateTime(user.CreatedAt),
 		UpdatedAt: response.DateTime(user.UpdatedAt),
+	}
+}
+
+type changePasswordReq struct {
+	ID          uint   `uri:"id"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
+func (req changePasswordReq) validate() error {
+	if err := utils.ValidatePassword(req.NewPassword); err != nil {
+		return errInvalidPassword
+	}
+
+	return nil
+}
+
+func (req changePasswordReq) toInput() usecase.ChangePasswordInput {
+	return usecase.ChangePasswordInput{
+		ID:          req.ID,
+		OldPassword: req.OldPassword,
+		NewPassword: req.NewPassword,
 	}
 }

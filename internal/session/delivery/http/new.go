@@ -1,20 +1,16 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/session/usecase"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler interface {
-	GetUsers(c *gin.Context)
-	GetOneUser(c *gin.Context)
-	CreateUser(c *gin.Context)
-	UpdateUser(c *gin.Context)
-	DeleteUser(c *gin.Context)
-	PromoteToAdmin(c *gin.Context)
-	DemoteToUser(c *gin.Context)
-	ChangePassword(c *gin.Context)
+	SignIn(c *gin.Context)
+	SignUp(c *gin.Context)
+	SignOut(c *gin.Context)
+	Refresh(c *gin.Context)
 }
 
 type handler struct {

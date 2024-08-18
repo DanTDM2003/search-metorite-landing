@@ -3,20 +3,20 @@ package usecase
 import (
 	"context"
 	"errors"
-	"strconv"
-	"time"
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
-	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
-	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 func (uc impleUsecase) GetUsers(ctx context.Context, input GetUsersInput) (GetUsersOutput, error) {
 	users, pag, err := uc.repo.GetUsers(ctx, repository.GetUsersOptions{
+		GetUsersFilter: repository.GetUsersFilter{
+			Username: input.Username,
+			Role:     input.Role,
+		},
 		PaginatorQuery: input.PaginatorQuery,
 	})
 	if err != nil {
@@ -35,7 +35,8 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
-				ID: input.ID,
+				ID:    input.ID,
+				Email: input.Email,
 			})
 			if err != nil {
 				if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -60,12 +61,21 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input GetOneUserInput) (m
 }
 
 func (uc impleUsecase) CreateUser(ctx context.Context, input CreateUserInput) (models.User, error) {
+	_, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
+		Email: input.Email,
+	})
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			uc.l.Errorf(ctx, "users.usecase.CreateUser.repo.GetOneUserByEmail: %v", err)
+			return models.User{}, err
+		}
+	} else {
+		uc.l.Warnf(ctx, "users.usecase.CreateUser.repo.GetOneUserByEmail: %v", ErrUserEmailExists)
+		return models.User{}, ErrUserEmailExists
+	}
+
 	user, err := uc.repo.CreateUser(ctx, input.toOptions())
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "users.usecase.CreateUser.repo.CreateUser: %v", ErrUserEmailExists)
-			return models.User{}, ErrUserEmailExists
-		}
 		uc.l.Errorf(ctx, "users.usecase.CreateUser.repo.CreateUser: %v", err)
 		return models.User{}, err
 	}
@@ -93,7 +103,6 @@ func (uc impleUsecase) UpdateUser(ctx context.Context, input UpdateUserInput) (m
 
 	user, err = uc.repo.UpdateUser(ctx, repository.UpdateUserOptions{
 		Username: input.Username,
-		Password: input.Password,
 		Email:    input.Email,
 	}, user)
 	if err != nil {
@@ -136,58 +145,6 @@ func (uc impleUsecase) DeleteUser(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOutput, error) {
-	user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
-		Email: input.Email,
-	})
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Warnf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", ErrUserNotFound)
-			return SignInOutput{}, ErrUserNotFound
-		}
-		uc.l.Errorf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", err)
-		return SignInOutput{}, err
-	}
-
-	token, err := uc.jwtManager.GenerateAccessToken(pkgJWT.Payload{
-		StandardClaims: jwt.StandardClaims{
-			Subject:   strconv.Itoa(int(user.ID)),
-			ExpiresAt: jwt.TimeFunc().Add(15 * time.Minute).Unix(),
-		},
-		Role: user.Role,
-	})
-	if err != nil {
-		uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GenerateAccessToken: %v", err)
-		return SignInOutput{}, err
-	}
-
-	if ok := utils.CheckPasswordHash(input.Password, user.Password); !ok {
-		uc.l.Warnf(ctx, "users.usecase.SignIn.user.ComparePassword: %v", err)
-		return SignInOutput{}, ErrWrongPassword
-	}
-
-	return SignInOutput{
-		User:  user,
-		Token: token,
-	}, nil
-}
-
-func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
-	user, err := uc.repo.CreateUser(ctx, input.toOptions())
-	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "users.usecase.SignUp.repo.CreateUser: %v", ErrUserEmailExists)
-			return SignUpOutput{}, ErrUserEmailExists
-		}
-		uc.l.Errorf(ctx, "users.usecase.SignUp.repo.CreateUser: %v", err)
-		return SignUpOutput{}, err
-	}
-
-	return SignUpOutput{
-		User: user,
-	}, nil
-}
-
 func (uc impleUsecase) PromoteToAdmin(ctx context.Context, id uint) (models.User, error) {
 	user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
 		ID: id,
@@ -201,13 +158,13 @@ func (uc impleUsecase) PromoteToAdmin(ctx context.Context, id uint) (models.User
 		return models.User{}, err
 	}
 
-	if user.Role == UserRoleAdmin {
+	if user.Role == models.UserRoleAdmin {
 		uc.l.Warnf(ctx, "users.usecase.PromoteToAdmin.user.CheckRole: %v", ErrUserAlreadyAdmin)
 		return models.User{}, ErrUserAlreadyAdmin
 	}
 
 	user, err = uc.repo.UpdateUser(ctx, repository.UpdateUserOptions{
-		Role: UserRoleAdmin,
+		Role: models.UserRoleAdmin,
 	}, user)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.PromoteToAdmin.repo.UpdateUser: %v", err)
@@ -235,13 +192,13 @@ func (uc impleUsecase) DemoteToUser(ctx context.Context, id uint) (models.User, 
 		return models.User{}, err
 	}
 
-	if user.Role == UserRoleUser {
+	if user.Role == models.UserRoleUser {
 		uc.l.Warnf(ctx, "users.usecase.DemoteToUser.user.CheckRole: %v", ErrUserAlreadyUser)
 		return models.User{}, ErrUserAlreadyUser
 	}
 
 	user, err = uc.repo.UpdateUser(ctx, repository.UpdateUserOptions{
-		Role: UserRoleUser,
+		Role: models.UserRoleUser,
 	}, user)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.DemoteToUser.repo.UpdateUser: %v", err)
@@ -254,4 +211,44 @@ func (uc impleUsecase) DemoteToUser(ctx context.Context, id uint) (models.User, 
 	}
 
 	return user, nil
+}
+
+func (uc impleUsecase) ChangePassword(ctx context.Context, input ChangePasswordInput) error {
+	user, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
+		ID: input.ID,
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			uc.l.Warnf(ctx, "users.usecase.ChangePassword.repo.GetOneUser: %v", ErrUserNotFound)
+			return ErrUserNotFound
+		}
+		uc.l.Errorf(ctx, "users.usecase.ChangePassword.repo.GetOneUser: %v", err)
+		return err
+	}
+
+	if ok := utils.CheckPasswordHash(input.OldPassword, user.Password); !ok {
+		uc.l.Warnf(ctx, "users.usecase.ChangePassword.user.ComparePassword: %v", err)
+		return ErrWrongPassword
+	}
+
+	hashedPassword, err := utils.HashPassword(input.NewPassword)
+	if err != nil {
+		uc.l.Errorf(ctx, "users.usecase.ChangePassword.user.HashPassword: %v", err)
+		return err
+	}
+
+	user, err = uc.repo.UpdateUser(ctx, repository.UpdateUserOptions{
+		Password: hashedPassword,
+	}, user)
+	if err != nil {
+		uc.l.Errorf(ctx, "users.usecase.ChangePassword.repo.UpdateUser: %v", err)
+		return err
+	}
+
+	if err := uc.redisRepo.SetUser(ctx, user); err != nil {
+		uc.l.Errorf(ctx, "users.usecase.ChangePassword.redis.SetUser: %v", err)
+		return err
+	}
+
+	return nil
 }

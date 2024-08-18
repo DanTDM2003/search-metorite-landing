@@ -117,48 +117,6 @@ func (h handler) DeleteUser(c *gin.Context) {
 	response.Success(c, nil)
 }
 
-func (h handler) SignIn(c *gin.Context) {
-	ctx := c.Request.Context()
-
-	req, err := h.processSignInReq(c)
-	if err != nil {
-		h.l.Warnf(ctx, "users.http.SignIn.processSignInReq: %v", err)
-		response.Error(c, err)
-		return
-	}
-
-	o, err := h.uc.SignIn(ctx, req.toInput())
-	if err != nil {
-		h.l.Errorf(ctx, "users.http.SignIn.uc.SignIn: %v", err)
-		mapErr := h.mapError(err)
-		response.Error(c, mapErr)
-		return
-	}
-
-	response.Success(c, h.newSignInResp(o))
-}
-
-func (h handler) SignUp(c *gin.Context) {
-	ctx := c.Request.Context()
-
-	req, err := h.processSignUpReq(c)
-	if err != nil {
-		h.l.Warnf(ctx, "users.http.SignUp.processSignUpReq: %v", err)
-		response.Error(c, err)
-		return
-	}
-
-	u, err := h.uc.SignUp(ctx, req.toInput())
-	if err != nil {
-		h.l.Errorf(ctx, "users.http.SignUp.uc.SignUp: %v", err)
-		mapErr := h.mapError(err)
-		response.Error(c, mapErr)
-		return
-	}
-
-	response.Success(c, h.newSignUpResp(u))
-}
-
 func (h handler) PromoteToAdmin(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -199,4 +157,25 @@ func (h handler) DemoteToUser(c *gin.Context) {
 	}
 
 	response.Success(c, h.newDemoteToUserResp(u))
+}
+
+func (h handler) ChangePassword(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	req, err := h.processChangePasswordReq(c)
+	if err != nil {
+		h.l.Warnf(ctx, "users.http.ChangePassword.processChangePasswordReq: %v", err)
+		response.Error(c, err)
+		return
+	}
+
+	err = h.uc.ChangePassword(ctx, req.toInput())
+	if err != nil {
+		h.l.Errorf(ctx, "users.http.ChangePassword.uc.ChangePassword: %v", err)
+		mapErr := h.mapError(err)
+		response.Error(c, mapErr)
+		return
+	}
+
+	response.Success(c, nil)
 }

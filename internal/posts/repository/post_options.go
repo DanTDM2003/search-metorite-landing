@@ -23,9 +23,8 @@ type CreatePostOptions struct {
 }
 
 type UpdatePostOptions struct {
-	AuthorID uint
-	Title    string
-	Content  string
+	Title   string
+	Content string
 }
 
 type DeletePostsOptions struct {

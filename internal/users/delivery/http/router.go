@@ -6,7 +6,6 @@ import (
 )
 
 func MapUserRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
-	r.POST("/signin", h.SignIn)
 	r.Use(m.Auth()).Use(m.UserSession())
 	r.GET("", h.GetUsers)
 	r.GET("/:id", h.GetOneUser)
@@ -15,5 +14,5 @@ func MapUserRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
 	r.DELETE("/:id", h.DeleteUser)
 	r.PATCH("/:id/promote", h.PromoteToAdmin)
 	r.PATCH("/:id/demote", h.DemoteToUser)
-	r.POST("/signup", h.SignUp)
+	r.PATCH("/:id/change-password", h.ChangePassword)
 }

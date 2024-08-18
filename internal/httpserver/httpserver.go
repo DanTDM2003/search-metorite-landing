@@ -19,6 +19,7 @@ func (srv HTTPServer) Run() error {
 		srv.gin.Run(fmt.Sprintf(":%d", srv.port))
 	}()
 
+	// Wait for interrupt signal to gracefully shutdown the server with
 	srv.l.Infof(ctx, "Started server on :%d", srv.port)
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)

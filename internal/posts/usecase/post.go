@@ -6,6 +6,7 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
+	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -38,7 +39,7 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 			})
 			if err != nil {
 				if errors.Is(err, gorm.ErrRecordNotFound) {
-					uc.l.Warnf(ctx, "posts.usecase.GetOnePost.repo.GetOnePost: %v", ErrPostNotFound)
+					uc.l.Warnf(ctx, "posts.usecase.GetOnePost.repo.GetOnePost: %v", err)
 					return models.Post{}, ErrPostNotFound
 				}
 				uc.l.Errorf(ctx, "posts.usecase.GetOnePost.repo.GetOnePost: %v", err)
@@ -59,16 +60,24 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 }
 
 func (uc impleUsecase) CreatePost(ctx context.Context, input CreatePostInput) (models.Post, error) {
+	_, err := uc.userUC.GetOneUser(ctx, userUC.GetOneUserInput{
+		ID: input.AuthorID,
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			uc.l.Warnf(ctx, "posts.usecase.CreatePost.userUC.GetOneUser: %v", err)
+			return models.Post{}, userUC.ErrUserNotFound
+		}
+		uc.l.Errorf(ctx, "posts.usecase.CreatePost.userUC.GetOneUser: %v", err)
+		return models.Post{}, err
+	}
+
 	post, err := uc.repo.CreatePost(ctx, repository.CreatePostOptions{
 		AuthorID: input.AuthorID,
 		Title:    input.Title,
 		Content:  input.Content,
 	})
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "posts.usecase.CreatePost.repo.CreatePost: %v", ErrAuthorNotFound)
-			return models.Post{}, ErrAuthorNotFound
-		}
 		uc.l.Errorf(ctx, "posts.usecase.CreatePost.repo.CreatePost: %v", err)
 		return models.Post{}, err
 	}
@@ -88,7 +97,7 @@ func (uc impleUsecase) UpdatePost(ctx context.Context, input UpdatePostInput) (m
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Warnf(ctx, "posts.usecase.UpdatePost.repo.GetOnePost: %v", ErrPostNotFound)
+			uc.l.Warnf(ctx, "posts.usecase.UpdatePost.repo.GetOnePost: %v", err)
 			return models.Post{}, ErrPostNotFound
 		}
 		uc.l.Errorf(ctx, "posts.usecase.UpdatePost.repo.GetOnePost: %v", err)
@@ -96,15 +105,10 @@ func (uc impleUsecase) UpdatePost(ctx context.Context, input UpdatePostInput) (m
 	}
 
 	post, err = uc.repo.UpdatePost(ctx, repository.UpdatePostOptions{
-		AuthorID: input.AuthorID,
-		Title:    input.Title,
-		Content:  input.Content,
+		Title:   input.Title,
+		Content: input.Content,
 	}, post)
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "posts.usecase.UpdatePost.repo.UpdatePost: %v", ErrAuthorNotFound)
-			return models.Post{}, ErrAuthorNotFound
-		}
 		uc.l.Errorf(ctx, "posts.usecase.UpdatePost.repo.UpdatePost: %v", err)
 		return models.Post{}, err
 	}
@@ -122,7 +126,7 @@ func (uc impleUsecase) DeletePost(ctx context.Context, id uint) error {
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Warnf(ctx, "posts.usecase.DeletePost.repo.GetOnePost: %v", ErrPostNotFound)
+			uc.l.Warnf(ctx, "posts.usecase.DeletePost.repo.GetOnePost: %v", err)
 			return ErrPostNotFound
 		}
 		uc.l.Errorf(ctx, "posts.usecase.DeletePost.repo.GetOnePost: %v", err)

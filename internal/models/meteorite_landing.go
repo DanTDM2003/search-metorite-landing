@@ -13,7 +13,7 @@ type MeteoriteLanding struct {
 	gorm.Model
 	ID          uint           `json:"id" gorm:"primaryKey"`
 	Year        time.Time      `json:"year" gorm:"not null"`
-	Name        string         `json:"name" gorm:"unique"`
+	Name        string         `json:"name" gorm:"not null;unique"`
 	NameType    string         `json:"name_type" gorm:"not null"`
 	Recclass    string         `json:"recclass" gorm:"not null"`
 	Mass        float64        `json:"mass" gorm:"not null"`

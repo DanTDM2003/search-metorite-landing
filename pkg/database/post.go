@@ -19,7 +19,6 @@ func migratePosts(db *gorm.DB, table interface{}) error {
 	}
 
 	post := models.Post{
-		ID:       1,
 		Title:    "Hello, World!",
 		Content:  "This is a test post.",
 		AuthorID: 1,

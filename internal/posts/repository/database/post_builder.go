@@ -16,15 +16,10 @@ func (repo impleRepository) buildCreatePostModel(opt repository.CreatePostOption
 func (repo impleRepository) buildUpdatePostModel(opt repository.UpdatePostOptions, post models.Post) models.Post {
 	update := models.Post{
 		ID:        post.ID,
+		AuthorID:  post.AuthorID,
 		ViewCount: post.ViewCount,
 		Rating:    post.Rating,
 		CreatedAt: post.CreatedAt,
-	}
-
-	if opt.AuthorID != 0 {
-		update.AuthorID = opt.AuthorID
-	} else {
-		update.AuthorID = post.AuthorID
 	}
 
 	if opt.Title != "" {

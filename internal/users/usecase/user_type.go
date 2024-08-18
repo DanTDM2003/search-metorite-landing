@@ -6,7 +6,8 @@ import (
 )
 
 type GetUsersFilter struct {
-	Role string
+	Username string
+	Role     string
 }
 
 type GetUsersInput struct {
@@ -20,7 +21,8 @@ type GetUsersOutput struct {
 }
 
 type GetOneUserInput struct {
-	ID uint
+	ID    uint
+	Email string
 }
 
 type CreateUserInput struct {
@@ -33,26 +35,10 @@ type UpdateUserInput struct {
 	ID       uint
 	Username string
 	Email    string
-	Password string
 }
 
-type SignInInput struct {
-	Email    string
-	Password string
-}
-
-type SignInOutput struct {
-	Token string
-	User  models.User
-}
-
-type SignUpInput struct {
-	Username string
-	Email    string
-	Password string
-}
-
-type SignUpOutput struct {
-	Token string
-	User  models.User
+type ChangePasswordInput struct {
+	ID          uint
+	OldPassword string
+	NewPassword string
 }

@@ -4,9 +4,26 @@ import (
 	"strings"
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
+	"gorm.io/gorm"
 )
 
-func (repo impleRepository) buildGetOnePostCondition(opt repository.GetOnePostOptions) (string, interface{}) {
+func (repo impleRepository) buildGetPostsCondition(cursor *gorm.DB, opt repository.GetPostsOptions) *gorm.DB {
+	var conditions []string
+	var params []interface{}
+
+	if opt.AuthorID != 0 {
+		conditions = append(conditions, "author_id = ?")
+		params = append(params, opt.AuthorID)
+	}
+
+	if len(conditions) > 0 {
+		cursor = cursor.Where(strings.Join(conditions, " AND "), params...)
+	}
+
+	return cursor
+}
+
+func (repo impleRepository) buildGetOnePostCondition(cursor *gorm.DB, opt repository.GetOnePostOptions) *gorm.DB {
 	var conditions []string
 	var params []interface{}
 
@@ -20,12 +37,14 @@ func (repo impleRepository) buildGetOnePostCondition(opt repository.GetOnePostOp
 		params = append(params, opt.AuthorID)
 	}
 
-	condition := strings.Join(conditions, " AND ")
+	if len(conditions) > 0 {
+		cursor = cursor.Where(strings.Join(conditions, " AND "), params...)
+	}
 
-	return condition, params
+	return cursor
 }
 
-func (repo impleRepository) buildDeletePostsCondition(opt repository.DeletePostsOptions) (string, interface{}) {
+func (repo impleRepository) buildDeletePostsCondition(cursor *gorm.DB, opt repository.DeletePostsOptions) *gorm.DB {
 	var conditions []string
 	var params []interface{}
 
@@ -39,7 +58,9 @@ func (repo impleRepository) buildDeletePostsCondition(opt repository.DeletePosts
 		params = append(params, opt.AuthorIDs)
 	}
 
-	condition := strings.Join(conditions, " AND ")
+	if len(conditions) > 0 {
+		cursor = cursor.Where(strings.Join(conditions, " AND "), params...)
+	}
 
-	return condition, params
+	return cursor
 }

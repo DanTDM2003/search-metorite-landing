@@ -55,6 +55,19 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 }
 
 func (uc impleUsecase) CreateMeteoriteLanding(ctx context.Context, input CreateMeteoriteLandingInput) (models.MeteoriteLanding, error) {
+	_, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+		Name: input.Name,
+	})
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			uc.l.Errorf(ctx, "meteorite_landings.usecase.CreateMeteoriteLanding.repo.GetOneMeteoriteLanding: %v", err)
+			return models.MeteoriteLanding{}, err
+		}
+	} else {
+		uc.l.Warnf(ctx, "meteorite_landings.usecase.CreateMeteoriteLanding.repo.GetOneMeteoriteLanding: %v", ErrMeteoriteLandingAlreadyExists)
+		return models.MeteoriteLanding{}, ErrMeteoriteLandingAlreadyExists
+	}
+
 	mL, err := uc.repo.CreateMeteoriteLanding(ctx, repository.CreateMeteoriteLandingOption{
 		Name:     input.Name,
 		NameType: input.NameType,
@@ -71,10 +84,6 @@ func (uc impleUsecase) CreateMeteoriteLanding(ctx context.Context, input CreateM
 		},
 	})
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "meteorite_landings.usecase.CreateMeteoriteLanding.repo.CreateMeteoriteLanding: %v", ErrMeteoriteLandingAlreadyExists)
-			return models.MeteoriteLanding{}, ErrMeteoriteLandingAlreadyExists
-		}
 		uc.l.Errorf(ctx, "meteorite_landings.usecase.CreateMeteoriteLanding.repo.CreateMeteoriteLanding: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
@@ -100,6 +109,21 @@ func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateM
 		return models.MeteoriteLanding{}, err
 	}
 
+	if input.Name != "" {
+		_, err = uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+			Name: input.Name,
+		})
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				uc.l.Errorf(ctx, "meteorite_landings.usecase.UpdateMeteoriteLanding.repo.GetOneMeteoriteLanding: %v", err)
+				return models.MeteoriteLanding{}, err
+			}
+		} else {
+			uc.l.Warnf(ctx, "meteorite_landings.usecase.UpdateMeteoriteLanding.repo.GetOneMeteoriteLanding: %v", ErrMeteoriteLandingAlreadyExists)
+			return models.MeteoriteLanding{}, ErrMeteoriteLandingAlreadyExists
+		}
+	}
+
 	mL, err = uc.repo.UpdateMeteoriteLanding(ctx, repository.UpdateMeteoriteLandingOption{
 		Name:     input.Name,
 		NameType: input.NameType,
@@ -116,10 +140,6 @@ func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateM
 		},
 	}, mL)
 	if err != nil {
-		if errors.Is(err, gorm.ErrCheckConstraintViolated) {
-			uc.l.Warnf(ctx, "meteorite_landings.usecase.UpdateMeteoriteLanding.repo.UpdateMeteoriteLanding: %v", ErrMeteoriteLandingAlreadyExists)
-			return models.MeteoriteLanding{}, ErrMeteoriteLandingAlreadyExists
-		}
 		uc.l.Errorf(ctx, "meteorite_landings.usecase.UpdateMeteoriteLanding.repo.UpdateMeteoriteLanding: %v", err)
 		return models.MeteoriteLanding{}, err
 	}
@@ -137,7 +157,7 @@ func (uc impleUsecase) DeleteMeteoriteLanding(ctx context.Context, id uint) erro
 		ID: id,
 	})
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			uc.l.Warnf(ctx, "meteorite_landings.usecase.DeleteMeteoriteLanding.repo.GetOneMeteoriteLanding: %v", ErrMeteoriteLandingsNotFound)
 			return ErrMeteoriteLandingsNotFound
 		}

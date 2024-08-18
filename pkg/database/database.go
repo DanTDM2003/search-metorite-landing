@@ -23,7 +23,7 @@ func tableExists(db *gorm.DB, model interface{}) bool {
 }
 
 func createTables(db *gorm.DB) error {
-	tables := []interface{}{models.MeteoriteLanding{}, models.User{}, models.Post{}, models.RefreshToken{}, models.Article{}}
+	tables := []interface{}{models.MeteoriteLanding{}, models.User{}, models.Post{}, models.Article{}}
 
 	for _, table := range tables {
 		var err error
@@ -35,8 +35,6 @@ func createTables(db *gorm.DB) error {
 				err = migrateUsers(db, table)
 			case models.Post:
 				err = migratePosts(db, table)
-			case models.RefreshToken:
-				err = migrateRefreshTokens(db, table)
 			case models.Article:
 				err = migrateArticles(db, table)
 			}

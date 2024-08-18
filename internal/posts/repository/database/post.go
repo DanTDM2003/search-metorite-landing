@@ -2,13 +2,10 @@ package database
 
 import (
 	"context"
-	"errors"
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
-	"github.com/DanTDM2003/search-api-docker-redis/pkg/postgres"
-	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -33,6 +30,8 @@ func (repo impleRepository) GetPosts(ctx context.Context, opt repository.GetPost
 		Offset(int(opt.PaginatorQuery.Offset())).
 		Limit(int(opt.Limit))
 
+	cursor = repo.buildGetPostsCondition(cursor, opt)
+
 	var posts []models.Post
 	if err := cursor.Find(&posts).Error; err != nil {
 		repo.l.Errorf(ctx, "posts.repository.database.GetPosts.db.Find: %v", err)
@@ -50,10 +49,10 @@ func (repo impleRepository) GetPosts(ctx context.Context, opt repository.GetPost
 func (repo impleRepository) GetOnePost(ctx context.Context, opt repository.GetOnePostOptions) (models.Post, error) {
 	table := repo.getTable()
 
-	cond, params := repo.buildGetOnePostCondition(opt)
+	cursor := repo.buildGetOnePostCondition(table, opt)
 
 	var post models.Post
-	if err := table.Where(cond, params).First(&post).Error; err != nil {
+	if err := cursor.First(&post).Error; err != nil {
 		repo.l.Errorf(ctx, "posts.repository.database.GetOnePost.db.First: %v", err)
 		return models.Post{}, err
 	}
@@ -66,11 +65,6 @@ func (repo impleRepository) CreatePost(ctx context.Context, opt repository.Creat
 
 	create := repo.buildCreatePostModel(opt)
 	if err := table.Create(&create).Error; err != nil {
-		var pgErr *pq.Error
-		if errors.As(err, &pgErr) && pgErr.Code == postgres.ErrForeignKeyViolation {
-			repo.l.Warnf(ctx, "posts.repository.database.CreatePost.db.Create: %v", err)
-			return models.Post{}, gorm.ErrCheckConstraintViolated
-		}
 		repo.l.Errorf(ctx, "posts.repository.database.CreatePost.db.Create: %v", err)
 		return models.Post{}, err
 	}
@@ -84,11 +78,6 @@ func (repo impleRepository) UpdatePost(ctx context.Context, opt repository.Updat
 	update := repo.buildUpdatePostModel(opt, post)
 
 	if err := table.Where("id = ?", post.ID).Updates(&update).Error; err != nil {
-		var pgErr *pq.Error
-		if errors.As(err, &pgErr) && pgErr.Code == postgres.ErrForeignKeyViolation {
-			repo.l.Warnf(ctx, "posts.repository.database.UpdatePost.db.Updates: %v", err)
-			return models.Post{}, gorm.ErrCheckConstraintViolated
-		}
 		repo.l.Errorf(ctx, "posts.repository.database.UpdatePost.db.Updates: %v", err)
 		return models.Post{}, err
 	}
@@ -110,9 +99,9 @@ func (repo impleRepository) DeletePost(ctx context.Context, id uint) error {
 func (repo impleRepository) DeletePosts(ctx context.Context, opt repository.DeletePostsOptions) error {
 	table := repo.getTable()
 
-	cond, params := repo.buildDeletePostsCondition(opt)
+	cursor := repo.buildDeletePostsCondition(table, opt)
 
-	if err := table.Where(cond, params).Delete(&models.Post{}).Error; err != nil {
+	if err := cursor.Delete(&models.Post{}).Error; err != nil {
 		repo.l.Errorf(ctx, "posts.repository.database.DeletePosts.db.Delete: %v", err)
 		return err
 	}

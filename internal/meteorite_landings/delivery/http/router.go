@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
-	r.Use(m.Auth())
+func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth())
 	r.GET("", h.GetMeteoriteLandings)
 	r.GET("/:id", h.GetOneMeteoriteLanding)
 	r.POST("", h.CreateMeteoriteLanding)

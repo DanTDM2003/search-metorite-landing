@@ -3,7 +3,8 @@ package repository
 import "github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
 
 type GetUsersFilter struct {
-	Role string
+	Username string
+	Role     string
 }
 
 type GetUsersOptions struct {

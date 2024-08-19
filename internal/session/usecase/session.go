@@ -9,20 +9,20 @@ import (
 	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
 )
 
 func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOutput, error) {
-	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
 	user, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Warnf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", userUC.ErrUserNotFound)
-			return SignInOutput{}, userUC.ErrUserNotFound
+		if errors.Is(err, userUC.ErrUserNotFound) {
+			uc.l.Warnf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", err)
+			return SignInOutput{}, err
 		}
 		uc.l.Errorf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", err)
 		return SignInOutput{}, err
@@ -87,18 +87,17 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 }
 
 func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
-	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
 	_, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			uc.l.Errorf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", err)
+		if errors.Is(err, userUC.ErrUserNotFound) {
+			uc.l.Warnf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", err)
 			return SignUpOutput{}, err
 		}
-	} else {
-		uc.l.Warnf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", userUC.ErrUserEmailExists)
-		return SignUpOutput{}, userUC.ErrUserEmailExists
+		uc.l.Errorf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", err)
+		return SignUpOutput{}, err
 	}
 
 	user, err := userService.CreateUser(ctx, userSrv.CreateUserInput{
@@ -176,6 +175,10 @@ func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (Refresh
 		ID: userID,
 	})
 	if err != nil {
+		if errors.Is(err, userUC.ErrUserNotFound) {
+			uc.l.Warnf(ctx, "users.usecase.Refresh.userUC.GetOneUser: %v", err)
+			return RefreshOutput{}, err
+		}
 		uc.l.Errorf(ctx, "users.usecase.Refresh.userUC.GetOneUser: %v", err)
 		return RefreshOutput{}, err
 	}

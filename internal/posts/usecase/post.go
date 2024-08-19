@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	application "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
+	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
-	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -61,14 +61,14 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 }
 
 func (uc impleUsecase) CreatePost(ctx context.Context, input CreatePostInput) (models.Post, error) {
-	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
-	_, err := userService.GetOneUser(ctx, application.GetOneUserInput{
+	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
+	_, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		ID: input.AuthorID,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			uc.l.Warnf(ctx, "posts.usecase.CreatePost.userUC.GetOneUser: %v", err)
-			return models.Post{}, userUC.ErrUserNotFound
+			return models.Post{}, err
 		}
 		uc.l.Errorf(ctx, "posts.usecase.CreatePost.userUC.GetOneUser: %v", err)
 		return models.Post{}, err

@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 
+	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
+	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
@@ -72,6 +75,19 @@ func (uc impleUsecase) CreateArticle(ctx context.Context, input CreateArticleInp
 	} else {
 		uc.l.Errorf(ctx, "articles.usecase.CreateArticle.repo.GetOneArticle: %v", ErrArticleTitleAlreadyUsed)
 		return models.Article{}, ErrArticleTitleAlreadyUsed
+	}
+
+	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
+	_, err = userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+		ID: input.AuthorID,
+	})
+	if err != nil {
+		if errors.Is(err, userUC.ErrUserNotFound) {
+			uc.l.Warnf(ctx, "articles.usecase.CreateArticle.userService.GetOneUser: %v", err)
+			return models.Article{}, err
+		}
+		uc.l.Errorf(ctx, "articles.usecase.CreateArticle.userService.GetOneUser: %v", err)
+		return models.Article{}, err
 	}
 
 	article, err := uc.repo.CreateArticle(ctx, repository.CreateArticleOptions{

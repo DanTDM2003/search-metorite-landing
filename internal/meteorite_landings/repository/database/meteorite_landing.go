@@ -17,7 +17,7 @@ func (repo impleRepository) getTable() *gorm.DB {
 	return repo.db.Table(meteoriteLandingsTable)
 }
 
-func (repo impleRepository) GetMetoriteLandings(ctx context.Context, opt repository.GetMeteoriteLandingsOption) ([]models.MeteoriteLanding, paginator.Paginator, error) {
+func (repo impleRepository) GetMetoriteLandings(ctx context.Context, opt repository.GetMeteoriteLandingsOptions) ([]models.MeteoriteLanding, paginator.Paginator, error) {
 	table := repo.getTable()
 	var mLs []models.MeteoriteLanding
 	var total int64
@@ -47,7 +47,7 @@ func (repo impleRepository) GetMetoriteLandings(ctx context.Context, opt reposit
 	}, nil
 }
 
-func (repo impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repository.GetOneMeteoriteLandingOption) (models.MeteoriteLanding, error) {
+func (repo impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repository.GetOneMeteoriteLandingOptions) (models.MeteoriteLanding, error) {
 	table := repo.getTable()
 
 	cursor := repo.buildGetOneMeteoriteLandingCondition(table, opt)
@@ -61,7 +61,7 @@ func (repo impleRepository) GetOneMeteoriteLanding(ctx context.Context, opt repo
 	return mL, nil
 }
 
-func (repo impleRepository) CreateMeteoriteLanding(ctx context.Context, opt repository.CreateMeteoriteLandingOption) (models.MeteoriteLanding, error) {
+func (repo impleRepository) CreateMeteoriteLanding(ctx context.Context, opt repository.CreateMeteoriteLandingOptions) (models.MeteoriteLanding, error) {
 	table := repo.getTable()
 
 	mL := repo.buildCreateMeteoriteLandingModel(opt)
@@ -74,7 +74,7 @@ func (repo impleRepository) CreateMeteoriteLanding(ctx context.Context, opt repo
 	return mL, nil
 }
 
-func (repo impleRepository) UpdateMeteoriteLanding(ctx context.Context, opt repository.UpdateMeteoriteLandingOption, mL models.MeteoriteLanding) (models.MeteoriteLanding, error) {
+func (repo impleRepository) UpdateMeteoriteLanding(ctx context.Context, opt repository.UpdateMeteoriteLandingOptions, mL models.MeteoriteLanding) (models.MeteoriteLanding, error) {
 	table := repo.getTable()
 
 	update := repo.buildUpdateMeteoriteLandingModel(opt, mL)

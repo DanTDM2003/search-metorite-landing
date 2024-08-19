@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	application "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"

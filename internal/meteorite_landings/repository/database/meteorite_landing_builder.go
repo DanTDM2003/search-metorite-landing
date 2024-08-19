@@ -5,7 +5,7 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 )
 
-func (uc impleRepository) buildCreateMeteoriteLandingModel(opt repository.CreateMeteoriteLandingOption) models.MeteoriteLanding {
+func (uc impleRepository) buildCreateMeteoriteLandingModel(opt repository.CreateMeteoriteLandingOptions) models.MeteoriteLanding {
 	return models.MeteoriteLanding{
 		Name:     opt.Name,
 		NameType: opt.NameType,
@@ -23,7 +23,7 @@ func (uc impleRepository) buildCreateMeteoriteLandingModel(opt repository.Create
 	}
 }
 
-func (uc impleRepository) buildUpdateMeteoriteLandingModel(opt repository.UpdateMeteoriteLandingOption, mL models.MeteoriteLanding) models.MeteoriteLanding {
+func (uc impleRepository) buildUpdateMeteoriteLandingModel(opt repository.UpdateMeteoriteLandingOptions, mL models.MeteoriteLanding) models.MeteoriteLanding {
 	update := models.MeteoriteLanding{
 		ID:        mL.ID,
 		CreatedAt: mL.CreatedAt,

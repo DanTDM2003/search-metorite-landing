@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (repo impleRepository) buildGetMeteoriteLandingsCondition(cursor *gorm.DB, opt repository.GetMeteoriteLandingsOption) *gorm.DB {
+func (repo impleRepository) buildGetMeteoriteLandingsCondition(cursor *gorm.DB, opt repository.GetMeteoriteLandingsOptions) *gorm.DB {
 	var conditions []string
 	var params []interface{}
 
@@ -33,7 +33,7 @@ func (repo impleRepository) buildGetMeteoriteLandingsCondition(cursor *gorm.DB, 
 	return cursor
 }
 
-func (repo impleRepository) buildGetOneMeteoriteLandingCondition(cursor *gorm.DB, opt repository.GetOneMeteoriteLandingOption) *gorm.DB {
+func (repo impleRepository) buildGetOneMeteoriteLandingCondition(cursor *gorm.DB, opt repository.GetOneMeteoriteLandingOptions) *gorm.DB {
 	var conditions []string
 	var params []interface{}
 

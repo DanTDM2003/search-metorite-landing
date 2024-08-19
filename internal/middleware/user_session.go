@@ -3,7 +3,7 @@ package middleware
 import (
 	"strconv"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	application "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"

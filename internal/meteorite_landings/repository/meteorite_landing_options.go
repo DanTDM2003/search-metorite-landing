@@ -12,12 +12,12 @@ type GetMeteoriteLandingsFilter struct {
 	Mass     float64
 }
 
-type GetMeteoriteLandingsOption struct {
+type GetMeteoriteLandingsOptions struct {
 	GetMeteoriteLandingsFilter
 	paginator.PaginatorQuery
 }
 
-type GetOneMeteoriteLandingOption struct {
+type GetOneMeteoriteLandingOptions struct {
 	ID   uint
 	Name string
 }
@@ -28,7 +28,7 @@ type GeoLocation struct {
 	NeedsRecoding bool
 }
 
-type CreateMeteoriteLandingOption struct {
+type CreateMeteoriteLandingOptions struct {
 	Name        string
 	NameType    string
 	Year        time.Time
@@ -40,7 +40,7 @@ type CreateMeteoriteLandingOption struct {
 	GeoLocation GeoLocation
 }
 
-type UpdateMeteoriteLandingOption struct {
+type UpdateMeteoriteLandingOptions struct {
 	Name        string
 	NameType    string
 	Year        time.Time

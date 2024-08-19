@@ -27,13 +27,15 @@ import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/middleware"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
+	pkgPassword "github.com/DanTDM2003/search-api-docker-redis/pkg/password"
 )
 
 func (srv HTTPServer) mapHandlers() error {
 	srv.gin.Use(middleware.Recovery())
 
-	// JWT
+	// Pkg
 	jwtManager := pkgJWT.New(srv.secretKey, srv.redis)
+	passwordManager := pkgPassword.New()
 
 	// MeteoriteLanding
 	meteoriteLandingRepo := mLDB.New(srv.l, srv.database)
@@ -44,7 +46,7 @@ func (srv HTTPServer) mapHandlers() error {
 	// User
 	userRepo := userDB.New(srv.l, srv.database)
 	userRedisRepo := userRedis.New(srv.l, srv.redis)
-	userUC := userUC.New(srv.l, userRepo, userRedisRepo)
+	userUC := userUC.New(srv.l, userRepo, userRedisRepo, passwordManager)
 	userH := userHTTP.New(srv.l, userUC)
 
 	// Post
@@ -60,7 +62,7 @@ func (srv HTTPServer) mapHandlers() error {
 	articleH := articleHTTP.New(srv.l, articleUC)
 
 	// Session
-	sessionUC := sessionUC.New(srv.l, jwtManager)
+	sessionUC := sessionUC.New(srv.l, jwtManager, passwordManager)
 	sessionH := sessionHTTP.New(srv.l, sessionUC)
 
 	// Service Locator

@@ -6,18 +6,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
-	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOutput, error) {
-	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
-	user, err := userService.GetOneUser(ctx, application.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	user, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
@@ -29,7 +28,7 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 		return SignInOutput{}, err
 	}
 
-	if ok := utils.CheckPasswordHash(input.Password, user.Password); !ok {
+	if ok := uc.passwordManager.CheckPasswordHash(input.Password, user.Password); !ok {
 		uc.l.Warnf(ctx, "users.usecase.SignIn.user.ComparePassword: %v", err)
 		return SignInOutput{}, userUC.ErrWrongPassword
 	}
@@ -88,8 +87,8 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 }
 
 func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
-	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
-	_, err := userService.GetOneUser(ctx, application.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	_, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
@@ -102,7 +101,7 @@ func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOut
 		return SignUpOutput{}, userUC.ErrUserEmailExists
 	}
 
-	user, err := userService.CreateUser(ctx, application.CreateUserInput{
+	user, err := userService.CreateUser(ctx, userSrv.CreateUserInput{
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
@@ -172,8 +171,8 @@ func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (Refresh
 		return RefreshOutput{}, err
 	}
 
-	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
-	user, err := userService.GetOneUser(ctx, application.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	user, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
 		ID: userID,
 	})
 	if err != nil {

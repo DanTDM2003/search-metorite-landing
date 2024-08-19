@@ -11,7 +11,7 @@ import (
 )
 
 func (uc impleUsecase) GetMeteoriteLandings(ctx context.Context, input GetMeteoriteLandingsInput) (GetMeteoriteLandingsOutput, error) {
-	mLs, pag, err := uc.repo.GetMetoriteLandings(ctx, repository.GetMeteoriteLandingsOption{
+	mLs, pag, err := uc.repo.GetMetoriteLandings(ctx, repository.GetMeteoriteLandingsOptions{
 		PaginatorQuery: input.PaginatorQuery,
 	})
 	if err != nil {
@@ -29,7 +29,7 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 	mL, err := uc.redis.GetMeteoriteLanding(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			mL, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+			mL, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOptions{
 				ID: input.ID,
 			})
 			if err != nil {
@@ -55,7 +55,7 @@ func (uc impleUsecase) GetOneMeteoriteLanding(ctx context.Context, input GetOneM
 }
 
 func (uc impleUsecase) CreateMeteoriteLanding(ctx context.Context, input CreateMeteoriteLandingInput) (models.MeteoriteLanding, error) {
-	_, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+	_, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOptions{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -68,7 +68,7 @@ func (uc impleUsecase) CreateMeteoriteLanding(ctx context.Context, input CreateM
 		return models.MeteoriteLanding{}, ErrMeteoriteLandingAlreadyExists
 	}
 
-	mL, err := uc.repo.CreateMeteoriteLanding(ctx, repository.CreateMeteoriteLandingOption{
+	mL, err := uc.repo.CreateMeteoriteLanding(ctx, repository.CreateMeteoriteLandingOptions{
 		Name:     input.Name,
 		NameType: input.NameType,
 		Year:     input.Year,
@@ -97,7 +97,7 @@ func (uc impleUsecase) CreateMeteoriteLanding(ctx context.Context, input CreateM
 }
 
 func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateMeteoriteLandingInput) (models.MeteoriteLanding, error) {
-	mL, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+	mL, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOptions{
 		ID: input.ID,
 	})
 	if err != nil {
@@ -110,7 +110,7 @@ func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateM
 	}
 
 	if input.Name != "" {
-		_, err = uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+		_, err = uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOptions{
 			Name: input.Name,
 		})
 		if err != nil {
@@ -124,7 +124,7 @@ func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateM
 		}
 	}
 
-	mL, err = uc.repo.UpdateMeteoriteLanding(ctx, repository.UpdateMeteoriteLandingOption{
+	mL, err = uc.repo.UpdateMeteoriteLanding(ctx, repository.UpdateMeteoriteLandingOptions{
 		Name:     input.Name,
 		NameType: input.NameType,
 		Year:     input.Year,
@@ -153,7 +153,7 @@ func (uc impleUsecase) UpdateMeteoriteLanding(ctx context.Context, input UpdateM
 }
 
 func (uc impleUsecase) DeleteMeteoriteLanding(ctx context.Context, id uint) error {
-	_, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOption{
+	_, err := uc.repo.GetOneMeteoriteLanding(ctx, repository.GetOneMeteoriteLandingOptions{
 		ID: id,
 	})
 	if err != nil {

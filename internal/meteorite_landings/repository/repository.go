@@ -8,9 +8,9 @@ import (
 )
 
 type Repository interface {
-	GetMetoriteLandings(ctx context.Context, opt GetMeteoriteLandingsOption) ([]models.MeteoriteLanding, paginator.Paginator, error)
-	GetOneMeteoriteLanding(ctx context.Context, opt GetOneMeteoriteLandingOption) (models.MeteoriteLanding, error)
-	CreateMeteoriteLanding(ctx context.Context, opt CreateMeteoriteLandingOption) (models.MeteoriteLanding, error)
-	UpdateMeteoriteLanding(ctx context.Context, opt UpdateMeteoriteLandingOption, mL models.MeteoriteLanding) (models.MeteoriteLanding, error)
+	GetMetoriteLandings(ctx context.Context, opt GetMeteoriteLandingsOptions) ([]models.MeteoriteLanding, paginator.Paginator, error)
+	GetOneMeteoriteLanding(ctx context.Context, opt GetOneMeteoriteLandingOptions) (models.MeteoriteLanding, error)
+	CreateMeteoriteLanding(ctx context.Context, opt CreateMeteoriteLandingOptions) (models.MeteoriteLanding, error)
+	UpdateMeteoriteLanding(ctx context.Context, opt UpdateMeteoriteLandingOptions, mL models.MeteoriteLanding) (models.MeteoriteLanding, error)
 	DeleteMeteoriteLanding(ctx context.Context, id uint) error
 }

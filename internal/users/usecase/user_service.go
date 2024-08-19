@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-func (uc impleUsecase) GetOneUser(ctx context.Context, input application.GetOneUserInput) (models.User, error) {
+func (uc impleUsecase) GetOneUser(ctx context.Context, input userSrv.GetOneUserInput) (models.User, error) {
 	user, err := uc.redisRepo.GetUser(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -41,7 +41,7 @@ func (uc impleUsecase) GetOneUser(ctx context.Context, input application.GetOneU
 	return user, nil
 }
 
-func (uc impleUsecase) CreateUser(ctx context.Context, input application.CreateUserInput) (models.User, error) {
+func (uc impleUsecase) CreateUser(ctx context.Context, input userSrv.CreateUserInput) (models.User, error) {
 	_, err := uc.repo.GetOneUser(ctx, repository.GetOneUserOptions{
 		Email: input.Email,
 	})
@@ -55,7 +55,18 @@ func (uc impleUsecase) CreateUser(ctx context.Context, input application.CreateU
 		return models.User{}, ErrUserEmailExists
 	}
 
-	user, err := uc.repo.CreateUser(ctx, buildCreateUserOptions(input))
+	hashedPassword, err := uc.passwordManager.HashPassword(input.Password)
+	if err != nil {
+		uc.l.Errorf(ctx, "users.usecase.CreateUser.passwordManager.HashPassword: %v", err)
+		return models.User{}, err
+	}
+
+	user, err := uc.repo.CreateUser(ctx, repository.CreateUserOptions{
+		Username: input.Username,
+		Email:    input.Email,
+		Role:     models.UserRoleUser,
+		Password: hashedPassword,
+	})
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.CreateUser.repo.CreateUser: %v", err)
 		return models.User{}, err

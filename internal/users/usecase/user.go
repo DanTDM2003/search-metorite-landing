@@ -6,7 +6,6 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
-	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -167,12 +166,12 @@ func (uc impleUsecase) ChangePassword(ctx context.Context, input ChangePasswordI
 		return err
 	}
 
-	if ok := utils.CheckPasswordHash(input.OldPassword, user.Password); !ok {
+	if ok := uc.passwordManager.CheckPasswordHash(input.OldPassword, user.Password); !ok {
 		uc.l.Warnf(ctx, "users.usecase.ChangePassword.user.ComparePassword: %v", err)
 		return ErrWrongPassword
 	}
 
-	hashedPassword, err := utils.HashPassword(input.NewPassword)
+	hashedPassword, err := uc.passwordManager.HashPassword(input.NewPassword)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.ChangePassword.user.HashPassword: %v", err)
 		return err

@@ -3,10 +3,11 @@ package usecase
 import (
 	"context"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	application "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/repository"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
+	pkgPassword "github.com/DanTDM2003/search-api-docker-redis/pkg/password"
 )
 
 type Usecase interface {
@@ -19,9 +20,10 @@ type Usecase interface {
 }
 
 type impleUsecase struct {
-	l         pkgLog.Logger
-	repo      repository.Repository
-	redisRepo repository.RedisRepository
+	l               pkgLog.Logger
+	repo            repository.Repository
+	redisRepo       repository.RedisRepository
+	passwordManager pkgPassword.Password
 }
 
 var _ Usecase = &impleUsecase{}
@@ -31,10 +33,12 @@ func New(
 	l pkgLog.Logger,
 	repo repository.Repository,
 	reidsRepo repository.RedisRepository,
+	passwordManager pkgPassword.Password,
 ) *impleUsecase {
 	return &impleUsecase{
-		l:         l,
-		repo:      repo,
-		redisRepo: reidsRepo,
+		l:               l,
+		repo:            repo,
+		redisRepo:       reidsRepo,
+		passwordManager: passwordManager,
 	}
 }

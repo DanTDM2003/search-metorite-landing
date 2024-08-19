@@ -8,8 +8,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
-COPY . .
+# Copy only the necessary directories
+COPY cmd/ ./cmd/
+COPY config/ ./config/
+COPY data/ ./data/
+COPY pkg/ ./pkg/
+COPY internal/ ./internal/
 
 # Build the Go app
 RUN go build -o api ./cmd/app

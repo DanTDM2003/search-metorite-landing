@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
+	application "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"

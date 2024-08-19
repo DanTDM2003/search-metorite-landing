@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
 
@@ -18,17 +18,16 @@ type Usecase interface {
 type impleUsecase struct {
 	l          pkgLog.Logger
 	jwtManager pkgJWT.Manager
-	userUC     userUC.Usecase
+	locator    *serviceLocator.ServiceLocator
 }
 
 func New(
 	l pkgLog.Logger,
-	userUC userUC.Usecase,
 	jwtManager pkgJWT.Manager,
 ) Usecase {
 	return &impleUsecase{
 		l:          l,
 		jwtManager: jwtManager,
-		userUC:     userUC,
+		locator:    serviceLocator.GetServiceLocator(),
 	}
 }

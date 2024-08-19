@@ -5,7 +5,7 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
-	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 )
 
@@ -21,19 +21,18 @@ type impleUsecase struct {
 	l         pkgLog.Logger
 	repo      repository.Repository
 	redisRepo repository.RedisRepository
-	userUC    userUC.Usecase
+	locator   *serviceLocator.ServiceLocator
 }
 
 func New(
 	l pkgLog.Logger,
 	repo repository.Repository,
 	redisRepo repository.RedisRepository,
-	userUC userUC.Usecase,
 ) Usecase {
 	return &impleUsecase{
 		l:         l,
 		repo:      repo,
 		redisRepo: redisRepo,
-		userUC:    userUC,
+		locator:   serviceLocator.GetServiceLocator(),
 	}
 }

@@ -3,7 +3,7 @@ package middleware
 import (
 	"strconv"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -26,7 +26,8 @@ func (m Middleware) UserSession() gin.HandlerFunc {
 			return
 		}
 
-		sessUser, err := m.userUC.GetOneUser(ctx, usecase.GetOneUserInput{
+		userService := m.locator.GetService("userUsecase").(application.UserUsecase)
+		sessUser, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 			ID: uint(sessUserID),
 		})
 		if err != nil {

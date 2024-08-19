@@ -26,6 +26,7 @@ import (
 
 	"github.com/DanTDM2003/search-api-docker-redis/internal/middleware"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 )
 
 func (srv HTTPServer) mapHandlers() error {
@@ -49,7 +50,7 @@ func (srv HTTPServer) mapHandlers() error {
 	// Post
 	postRepo := postDB.New(srv.l, srv.database)
 	postRedisRepo := postRedis.New(srv.l, srv.redis)
-	postUC := postUC.New(srv.l, postRepo, postRedisRepo, userUC)
+	postUC := postUC.New(srv.l, postRepo, postRedisRepo)
 	postH := postHTTP.New(srv.l, postUC)
 
 	// Article
@@ -59,18 +60,22 @@ func (srv HTTPServer) mapHandlers() error {
 	articleH := articleHTTP.New(srv.l, articleUC)
 
 	// Session
-	sessionUC := sessionUC.New(srv.l, userUC, jwtManager)
+	sessionUC := sessionUC.New(srv.l, jwtManager)
 	sessionH := sessionHTTP.New(srv.l, sessionUC)
 
+	// Service Locator
+	locator := serviceLocator.GetServiceLocator()
+	locator.RegisterService(serviceLocator.UserService, userUC)
+
 	// Middleware
-	mw := middleware.New(srv.l, jwtManager, userUC)
+	mw := middleware.New(srv.l, jwtManager)
 
 	// API Routes
 	api := srv.gin.Group("api/v1")
 	mLHTTP.MapMeteoriteLandingRoutes(api.Group("meteorite-landings"), meteoriteLandingH, mw)
 	userHTTP.MapUserRoutes(api.Group("users"), userH, mw)
 	postHTTP.MapPostRoutes(api.Group("posts"), postH, mw)
-	articleHTTP.MapArticleRoutes(api.Group("articles"), articleH)
+	articleHTTP.MapArticleRoutes(api.Group("articles"), articleH, mw)
 	sessionHTTP.MapSessionRoutes(api.Group("session"), sessionH, mw)
 
 	return nil

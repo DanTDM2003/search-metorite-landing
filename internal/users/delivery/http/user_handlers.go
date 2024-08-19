@@ -1,7 +1,9 @@
 package http
 
 import (
+	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +35,7 @@ func (h handler) GetUsers(c *gin.Context) {
 
 func (h handler) GetOneUser(c *gin.Context) {
 	ctx := c.Request.Context()
+	userService := h.locator.GetService(serviceLocator.UserService).(application.UserUsecase)
 
 	req, err := h.processGetOneUserReq(c)
 	if err != nil {
@@ -41,7 +44,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 		return
 	}
 
-	u, err := h.uc.GetOneUser(ctx, usecase.GetOneUserInput{
+	u, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 		ID: req.ID,
 	})
 	if err != nil {
@@ -56,6 +59,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 
 func (h handler) CreateUser(c *gin.Context) {
 	ctx := c.Request.Context()
+	userService := h.locator.GetService("userUsecase").(application.UserUsecase)
 
 	req, err := h.processCreateUserReq(c)
 	if err != nil {
@@ -64,7 +68,7 @@ func (h handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	u, err := h.uc.CreateUser(ctx, req.toInput())
+	u, err := userService.CreateUser(ctx, req.toInput())
 	if err != nil {
 		h.l.Errorf(ctx, "users.http.CreateUser.uc.CreateUser: %v", err)
 		mapErr := h.mapError(err)

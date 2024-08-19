@@ -20,17 +20,6 @@ type GetUsersOutput struct {
 	Paginator paginator.Paginator
 }
 
-type GetOneUserInput struct {
-	ID    uint
-	Email string
-}
-
-type CreateUserInput struct {
-	Username string
-	Email    string
-	Password string
-}
-
 type UpdateUserInput struct {
 	ID       uint
 	Username string

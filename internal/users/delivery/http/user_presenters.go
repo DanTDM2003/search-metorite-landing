@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
@@ -88,8 +89,8 @@ func (req createUserReq) validate() error {
 	return nil
 }
 
-func (req createUserReq) toInput() usecase.CreateUserInput {
-	return usecase.CreateUserInput{
+func (req createUserReq) toInput() application.CreateUserInput {
+	return application.CreateUserInput{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
@@ -60,7 +61,8 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 }
 
 func (uc impleUsecase) CreatePost(ctx context.Context, input CreatePostInput) (models.Post, error) {
-	_, err := uc.userUC.GetOneUser(ctx, userUC.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
+	_, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 		ID: input.AuthorID,
 	})
 	if err != nil {

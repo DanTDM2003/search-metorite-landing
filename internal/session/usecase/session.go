@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/DanTDM2003/search-api-docker-redis/internal/application"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
@@ -15,7 +16,8 @@ import (
 )
 
 func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOutput, error) {
-	user, err := uc.userUC.GetOneUser(ctx, userUC.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
+	user, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
@@ -86,7 +88,8 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 }
 
 func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
-	_, err := uc.userUC.GetOneUser(ctx, userUC.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
+	_, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
@@ -99,7 +102,7 @@ func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOut
 		return SignUpOutput{}, userUC.ErrUserEmailExists
 	}
 
-	user, err := uc.userUC.CreateUser(ctx, userUC.CreateUserInput{
+	user, err := userService.CreateUser(ctx, application.CreateUserInput{
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
@@ -169,7 +172,8 @@ func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (Refresh
 		return RefreshOutput{}, err
 	}
 
-	user, err := uc.userUC.GetOneUser(ctx, userUC.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(application.UserUsecase)
+	user, err := userService.GetOneUser(ctx, application.GetOneUserInput{
 		ID: userID,
 	})
 	if err != nil {

@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MapPostRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
-	r.Use(m.Auth())
+func MapPostRoutes(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth())
 	r.GET("", h.GetPosts)
 	r.GET("/:id", h.GetOnePost)
 	r.POST("", h.CreatePost)

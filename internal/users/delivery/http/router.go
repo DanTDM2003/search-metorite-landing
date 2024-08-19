@@ -5,14 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MapUserRoutes(r *gin.RouterGroup, h Handler, m middleware.Middleware) {
-	r.Use(m.Auth()).Use(m.UserSession())
+func MapUserRoutes(r *gin.RouterGroup, h Handler, mw middleware.Middleware) {
+	r.Use(mw.Auth()).Use(mw.UserSession())
 	r.GET("", h.GetUsers)
 	r.GET("/:id", h.GetOneUser)
-	r.POST("", h.CreateUser)
+	r.POST("", mw.Permission(), h.CreateUser)
 	r.PUT("/:id", h.UpdateUser)
-	r.DELETE("/:id", h.DeleteUser)
-	r.PATCH("/:id/promote", h.PromoteToAdmin)
-	r.PATCH("/:id/demote", h.DemoteToUser)
+	r.DELETE("/:id", mw.Permission(), h.DeleteUser)
+	r.PATCH("/:id/promote", mw.Permission(), h.PromoteToAdmin)
+	r.PATCH("/:id/demote", mw.Permission(), h.DemoteToUser)
 	r.PATCH("/:id/change-password", h.ChangePassword)
 }

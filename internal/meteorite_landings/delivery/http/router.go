@@ -9,7 +9,7 @@ func MapMeteoriteLandingRoutes(r *gin.RouterGroup, h Handler, mw middleware.Midd
 	r.Use(mw.Auth())
 	r.GET("", h.GetMeteoriteLandings)
 	r.GET("/:id", h.GetOneMeteoriteLanding)
-	r.POST("", h.CreateMeteoriteLanding)
+	r.POST("", mw.Permission(), h.CreateMeteoriteLanding)
 	r.PUT("/:id", h.UpdateMeteoriteLanding)
-	r.DELETE("/:id", h.DeleteMeteoriteLanding)
+	r.DELETE("/:id", mw.Permission(), h.DeleteMeteoriteLanding)
 }

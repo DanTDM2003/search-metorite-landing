@@ -26,3 +26,11 @@ func GetUserFromContext(ctx context.Context) (models.User, bool) {
 	user, ok := ctx.Value(UserCtxKey{}).(models.User)
 	return user, ok
 }
+
+func GetRoleFromContext(ctx context.Context) string {
+	user, ok := GetUserFromContext(ctx)
+	if !ok {
+		return ""
+	}
+	return user.Role
+}

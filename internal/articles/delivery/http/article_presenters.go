@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/articles/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/articles"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
@@ -26,7 +26,7 @@ type getArticlesResp struct {
 	Meta  paginator.PaginatorResponse `json:"meta"`
 }
 
-func (h handler) newGetArticlesResp(o usecase.GetArticlesOutput) getArticlesResp {
+func (h handler) newGetArticlesResp(o articles.GetArticlesOutput) getArticlesResp {
 	items := make([]getArticlesRespItem, 0, len(o.Articles))
 	for _, article := range o.Articles {
 		items = append(items, getArticlesRespItem{

@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/session"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	pkgJWT "github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
@@ -14,23 +15,23 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOutput, error) {
-	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
-	user, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+func (uc impleUsecase) SignIn(ctx context.Context, input session.SignInInput) (session.SignInOutput, error) {
+	userService := uc.locator.GetService(serviceLocator.UserService).(users.Usecase)
+	user, err := userService.GetOneUser(ctx, users.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
 		if errors.Is(err, userUC.ErrUserNotFound) {
 			uc.l.Warnf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", err)
-			return SignInOutput{}, err
+			return session.SignInOutput{}, err
 		}
 		uc.l.Errorf(ctx, "users.usecase.SignIn.repo.GetOneUserByEmail: %v", err)
-		return SignInOutput{}, err
+		return session.SignInOutput{}, err
 	}
 
 	if ok := uc.passwordManager.CheckPasswordHash(input.Password, user.Password); !ok {
 		uc.l.Warnf(ctx, "users.usecase.SignIn.user.ComparePassword: %v", err)
-		return SignInOutput{}, userUC.ErrWrongPassword
+		return session.SignInOutput{}, userUC.ErrWrongPassword
 	}
 
 	refreshToken, err := uc.jwtManager.GetRefreshToken(user.ID)
@@ -39,17 +40,17 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 			refreshToken, err = uc.jwtManager.GenerateRefreshToken(user.ID)
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GenerateRefreshToken: %v", err)
-				return SignInOutput{}, err
+				return session.SignInOutput{}, err
 			}
 
 			err = uc.jwtManager.StoreRefreshToken(user.ID, refreshToken)
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.StoreRefreshToken: %v", err)
-				return SignInOutput{}, err
+				return session.SignInOutput{}, err
 			}
 		} else {
 			uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GetRefreshToken: %v", err)
-			return SignInOutput{}, err
+			return session.SignInOutput{}, err
 		}
 	}
 
@@ -65,61 +66,61 @@ func (uc impleUsecase) SignIn(ctx context.Context, input SignInInput) (SignInOut
 			})
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GenerateAccessToken: %v", err)
-				return SignInOutput{}, err
+				return session.SignInOutput{}, err
 			}
 
 			err = uc.jwtManager.StoreAccessToken(user.ID, accessToken)
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.StoreAccessToken: %v", err)
-				return SignInOutput{}, err
+				return session.SignInOutput{}, err
 			}
 		} else {
 			uc.l.Errorf(ctx, "users.usecase.SignIn.jwtManager.GetAccessToken: %v", err)
-			return SignInOutput{}, err
+			return session.SignInOutput{}, err
 		}
 	}
 
-	return SignInOutput{
+	return session.SignInOutput{
 		User:         user,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
-func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOutput, error) {
-	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
-	_, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+func (uc impleUsecase) SignUp(ctx context.Context, input session.SignUpInput) (session.SignUpOutput, error) {
+	userService := uc.locator.GetService(serviceLocator.UserService).(users.Usecase)
+	_, err := userService.GetOneUser(ctx, users.GetOneUserInput{
 		Email: input.Email,
 	})
 	if err != nil {
 		if errors.Is(err, userUC.ErrUserNotFound) {
 			uc.l.Warnf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", err)
-			return SignUpOutput{}, err
+			return session.SignUpOutput{}, err
 		}
 		uc.l.Errorf(ctx, "users.usecase.SignUp.repo.GetOneUserByEmail: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
-	user, err := userService.CreateUser(ctx, userSrv.CreateUserInput{
+	user, err := userService.CreateUser(ctx, users.CreateUserInput{
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.SignUp.repo.CreateUser: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
 	refreshToken, err := uc.jwtManager.GenerateRefreshToken(user.ID)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.SignUp.jwtManager.GenerateRefreshToken: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
 	err = uc.jwtManager.StoreRefreshToken(user.ID, refreshToken)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.SignUp.jwtManager.StoreRefreshToken: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
 	accessToken, err := uc.jwtManager.GenerateAccessToken(pkgJWT.Payload{
@@ -131,16 +132,16 @@ func (uc impleUsecase) SignUp(ctx context.Context, input SignUpInput) (SignUpOut
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.SignUp.jwtManager.GenerateAccessToken: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
 	err = uc.jwtManager.StoreAccessToken(user.ID, accessToken)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.SignUp.jwtManager.StoreAccessToken: %v", err)
-		return SignUpOutput{}, err
+		return session.SignUpOutput{}, err
 	}
 
-	return SignUpOutput{
+	return session.SignUpOutput{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		User:         user,
@@ -163,24 +164,24 @@ func (uc impleUsecase) SignOut(ctx context.Context, userID uint) error {
 	return nil
 }
 
-func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (RefreshOutput, error) {
+func (uc impleUsecase) Refresh(ctx context.Context, input session.RefreshInput) (session.RefreshOutput, error) {
 	userID, err := uc.jwtManager.VerifyRefreshToken(input.RefreshToken)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.VerifyRefreshToken: %v", err)
-		return RefreshOutput{}, err
+		return session.RefreshOutput{}, err
 	}
 
-	userService := uc.locator.GetService("userUsecase").(userSrv.UserUsecase)
-	user, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+	userService := uc.locator.GetService("userUsecase").(users.Usecase)
+	user, err := userService.GetOneUser(ctx, users.GetOneUserInput{
 		ID: userID,
 	})
 	if err != nil {
 		if errors.Is(err, userUC.ErrUserNotFound) {
 			uc.l.Warnf(ctx, "users.usecase.Refresh.userUC.GetOneUser: %v", err)
-			return RefreshOutput{}, err
+			return session.RefreshOutput{}, err
 		}
 		uc.l.Errorf(ctx, "users.usecase.Refresh.userUC.GetOneUser: %v", err)
-		return RefreshOutput{}, err
+		return session.RefreshOutput{}, err
 	}
 
 	refreshToken, err := uc.jwtManager.GetRefreshToken(user.ID)
@@ -189,17 +190,17 @@ func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (Refresh
 			refreshToken, err = uc.jwtManager.GenerateRefreshToken(user.ID)
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.GenerateRefreshToken: %v", err)
-				return RefreshOutput{}, err
+				return session.RefreshOutput{}, err
 			}
 
 			err = uc.jwtManager.StoreRefreshToken(user.ID, refreshToken)
 			if err != nil {
 				uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.StoreRefreshToken: %v", err)
-				return RefreshOutput{}, err
+				return session.RefreshOutput{}, err
 			}
 		} else {
 			uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.GetRefreshToken: %v", err)
-			return RefreshOutput{}, err
+			return session.RefreshOutput{}, err
 		}
 	}
 
@@ -212,16 +213,16 @@ func (uc impleUsecase) Refresh(ctx context.Context, input RefreshInput) (Refresh
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.GenerateAccessToken: %v", err)
-		return RefreshOutput{}, err
+		return session.RefreshOutput{}, err
 	}
 
 	err = uc.jwtManager.StoreAccessToken(user.ID, accessToken)
 	if err != nil {
 		uc.l.Errorf(ctx, "users.usecase.Refresh.jwtManager.StoreAccessToken: %v", err)
-		return RefreshOutput{}, err
+		return session.RefreshOutput{}, err
 	}
 
-	return RefreshOutput{
+	return session.RefreshOutput{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil

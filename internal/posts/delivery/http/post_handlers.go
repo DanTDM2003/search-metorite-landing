@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/posts"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +16,8 @@ func (h handler) GetPosts(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.GetPosts(ctx, usecase.GetPostsInput{
-		GetPostsFilter: usecase.GetPostsFilter{
+	o, err := h.uc.GetPosts(ctx, posts.GetPostsInput{
+		GetPostsFilter: posts.GetPostsFilter{
 			AuthorID: req.AuthorID,
 		},
 		PaginatorQuery: pagQuery,
@@ -42,7 +42,7 @@ func (h handler) GetOnePost(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.GetOnePost(ctx, usecase.GetOnePostInput{
+	o, err := h.uc.GetOnePost(ctx, posts.GetOnePostInput{
 		ID:       req.ID,
 		AuthorID: req.AuthorID,
 	})
@@ -66,7 +66,7 @@ func (h handler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.CreatePost(ctx, usecase.CreatePostInput{
+	o, err := h.uc.CreatePost(ctx, posts.CreatePostInput{
 		AuthorID: req.AuthorID,
 		Title:    req.Title,
 		Content:  req.Content,
@@ -91,7 +91,7 @@ func (h handler) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.UpdatePost(ctx, usecase.UpdatePostInput{
+	o, err := h.uc.UpdatePost(ctx, posts.UpdatePostInput{
 		ID:       req.ID,
 		AuthorID: req.AuthorID,
 		Title:    req.Title,

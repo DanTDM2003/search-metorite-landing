@@ -1,8 +1,7 @@
 package http
 
 import (
-	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
@@ -18,8 +17,8 @@ func (h handler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.GetUsers(ctx, usecase.GetUsersInput{
-		GetUsersFilter: usecase.GetUsersFilter{
+	o, err := h.uc.GetUsers(ctx, users.GetUsersInput{
+		GetUsersFilter: users.GetUsersFilter{
 			Role: req.Role,
 		},
 		PaginatorQuery: pagQuery,
@@ -35,7 +34,7 @@ func (h handler) GetUsers(c *gin.Context) {
 
 func (h handler) GetOneUser(c *gin.Context) {
 	ctx := c.Request.Context()
-	userService := h.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
+	userService := h.locator.GetService(serviceLocator.UserService).(users.Usecase)
 
 	req, err := h.processGetOneUserReq(c)
 	if err != nil {
@@ -44,7 +43,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 		return
 	}
 
-	u, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+	u, err := userService.GetOneUser(ctx, users.GetOneUserInput{
 		ID: req.ID,
 	})
 	if err != nil {
@@ -59,7 +58,7 @@ func (h handler) GetOneUser(c *gin.Context) {
 
 func (h handler) CreateUser(c *gin.Context) {
 	ctx := c.Request.Context()
-	userService := h.locator.GetService("userUsecase").(userSrv.UserUsecase)
+	userService := h.locator.GetService("userUsecase").(users.Usecase)
 
 	req, err := h.processCreateUserReq(c)
 	if err != nil {

@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	pkgLog "github.com/DanTDM2003/search-api-docker-redis/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -20,13 +20,13 @@ type Handler interface {
 
 type handler struct {
 	l       pkgLog.Logger
-	uc      usecase.Usecase
+	uc      users.Usecase
 	locator *serviceLocator.ServiceLocator
 }
 
 func New(
 	l pkgLog.Logger,
-	uc usecase.Usecase,
+	uc users.Usecase,
 ) Handler {
 	return &handler{
 		l:       l,

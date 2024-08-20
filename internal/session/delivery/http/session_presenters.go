@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/session/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/session"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
 )
@@ -23,8 +23,8 @@ func (req signInReq) validate() error {
 	return nil
 }
 
-func (req signInReq) toInput() usecase.SignInInput {
-	return usecase.SignInInput{
+func (req signInReq) toInput() session.SignInInput {
+	return session.SignInInput{
 		Email:    req.Email,
 		Password: req.Password,
 	}
@@ -45,7 +45,7 @@ type signInResp struct {
 	User         user   `json:"user"`
 }
 
-func (h handler) newSignInResp(o usecase.SignInOutput) signInResp {
+func (h handler) newSignInResp(o session.SignInOutput) signInResp {
 	return signInResp{
 		AccessToken:  o.AccessToken,
 		RefreshToken: o.RefreshToken,
@@ -78,8 +78,8 @@ func (req signUpReq) validate() error {
 	return nil
 }
 
-func (req signUpReq) toInput() usecase.SignUpInput {
-	return usecase.SignUpInput{
+func (req signUpReq) toInput() session.SignUpInput {
+	return session.SignUpInput{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
@@ -92,7 +92,7 @@ type signUpResp struct {
 	User         user   `json:"user"`
 }
 
-func (h handler) newSignUpResp(o usecase.SignUpOutput) signUpResp {
+func (h handler) newSignUpResp(o session.SignUpOutput) signUpResp {
 	return signUpResp{
 		AccessToken:  o.AccessToken,
 		RefreshToken: o.RefreshToken,
@@ -116,7 +116,7 @@ type refreshResp struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func (h handler) newRefreshResp(o usecase.RefreshOutput) refreshResp {
+func (h handler) newRefreshResp(o session.RefreshOutput) refreshResp {
 	return refreshResp{
 		AccessToken:  o.AccessToken,
 		RefreshToken: o.RefreshToken,

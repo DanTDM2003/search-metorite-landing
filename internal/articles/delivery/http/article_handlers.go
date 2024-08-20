@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/DanTDM2003/search-api-docker-redis/internal/articles/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/articles"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,7 @@ func (h handler) GetArticles(c *gin.Context) {
 		return
 	}
 
-	output, err := h.uc.GetArticles(ctx, usecase.GetArticlesInput{
+	output, err := h.uc.GetArticles(ctx, articles.GetArticlesInput{
 		PaginatorQuery: pagQuery,
 	})
 	if err != nil {
@@ -38,7 +38,7 @@ func (h handler) GetOneArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.uc.GetOneArticle(ctx, usecase.GetOneArticleInput{
+	article, err := h.uc.GetOneArticle(ctx, articles.GetOneArticleInput{
 		Slug: req.Slug,
 	})
 	if err != nil {
@@ -60,7 +60,7 @@ func (h handler) CreateArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.uc.CreateArticle(ctx, usecase.CreateArticleInput{
+	article, err := h.uc.CreateArticle(ctx, articles.CreateArticleInput{
 		Title:   req.Title,
 		Content: req.Content,
 		Tag:     req.Tag,
@@ -84,7 +84,7 @@ func (h handler) UpdateArticle(c *gin.Context) {
 		return
 	}
 
-	article, err := h.uc.UpdateArticle(ctx, usecase.UpdateArticleInput{
+	article, err := h.uc.UpdateArticle(ctx, articles.UpdateArticleInput{
 		ID:      req.ID,
 		Title:   req.Title,
 		Content: req.Content,

@@ -4,16 +4,17 @@ import (
 	"context"
 	"errors"
 
-	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/posts"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/posts/repository"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-func (uc impleUsecase) GetPosts(ctx context.Context, input GetPostsInput) (GetPostsOutput, error) {
-	posts, pag, err := uc.repo.GetPosts(ctx, repository.GetPostsOptions{
+func (uc impleUsecase) GetPosts(ctx context.Context, input posts.GetPostsInput) (posts.GetPostsOutput, error) {
+	ps, pag, err := uc.repo.GetPosts(ctx, repository.GetPostsOptions{
 		GetPostsFilter: repository.GetPostsFilter{
 			AuthorID: input.AuthorID,
 		},
@@ -21,16 +22,16 @@ func (uc impleUsecase) GetPosts(ctx context.Context, input GetPostsInput) (GetPo
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "posts.usecase.GetPosts.repo.GetPosts: %v", err)
-		return GetPostsOutput{}, err
+		return posts.GetPostsOutput{}, err
 	}
 
-	return GetPostsOutput{
-		Posts:     posts,
+	return posts.GetPostsOutput{
+		Posts:     ps,
 		Paginator: pag,
 	}, nil
 }
 
-func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (models.Post, error) {
+func (uc impleUsecase) GetOnePost(ctx context.Context, input posts.GetOnePostInput) (models.Post, error) {
 	post, err := uc.redisRepo.GetPost(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -60,9 +61,9 @@ func (uc impleUsecase) GetOnePost(ctx context.Context, input GetOnePostInput) (m
 	return post, nil
 }
 
-func (uc impleUsecase) CreatePost(ctx context.Context, input CreatePostInput) (models.Post, error) {
-	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
-	_, err := userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+func (uc impleUsecase) CreatePost(ctx context.Context, input posts.CreatePostInput) (models.Post, error) {
+	userService := uc.locator.GetService(serviceLocator.UserService).(users.Usecase)
+	_, err := userService.GetOneUser(ctx, users.GetOneUserInput{
 		ID: input.AuthorID,
 	})
 	if err != nil {
@@ -92,7 +93,7 @@ func (uc impleUsecase) CreatePost(ctx context.Context, input CreatePostInput) (m
 	return post, nil
 }
 
-func (uc impleUsecase) UpdatePost(ctx context.Context, input UpdatePostInput) (models.Post, error) {
+func (uc impleUsecase) UpdatePost(ctx context.Context, input posts.UpdatePostInput) (models.Post, error) {
 	post, err := uc.repo.GetOnePost(ctx, repository.GetOnePostOptions{
 		ID:       input.ID,
 		AuthorID: input.AuthorID,

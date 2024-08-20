@@ -3,7 +3,7 @@ package http
 import (
 	"strconv"
 
-	"github.com/DanTDM2003/search-api-docker-redis/internal/session/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/session"
 	pkgError "github.com/DanTDM2003/search-api-docker-redis/pkg/errors"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/jwt"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
@@ -90,7 +90,7 @@ func (h handler) Refresh(c *gin.Context) {
 		return
 	}
 
-	o, err := h.uc.Refresh(ctx, usecase.RefreshInput{
+	o, err := h.uc.Refresh(ctx, session.RefreshInput{
 		RefreshToken: req.RefreshToken,
 	})
 	if err != nil {

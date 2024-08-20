@@ -1,9 +1,8 @@
 package http
 
 import (
-	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
-	"github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/paginator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/response"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
@@ -27,7 +26,7 @@ type getUsersResp struct {
 	Meta paginator.PaginatorResponse `json:"meta"`
 }
 
-func (h handler) newGetUsersResp(o usecase.GetUsersOutput) getUsersResp {
+func (h handler) newGetUsersResp(o users.GetUsersOutput) getUsersResp {
 	var items []getUsersRespItem
 
 	for _, item := range o.Users {
@@ -89,8 +88,8 @@ func (req createUserReq) validate() error {
 	return nil
 }
 
-func (req createUserReq) toInput() userSrv.CreateUserInput {
-	return userSrv.CreateUserInput{
+func (req createUserReq) toInput() users.CreateUserInput {
+	return users.CreateUserInput{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
@@ -140,8 +139,8 @@ func (req updateUserReq) validate() error {
 	return nil
 }
 
-func (req updateUserReq) toInput() usecase.UpdateUserInput {
-	return usecase.UpdateUserInput{
+func (req updateUserReq) toInput() users.UpdateUserInput {
+	return users.UpdateUserInput{
 		ID:       req.ID,
 		Username: req.Username,
 		Email:    req.Email,
@@ -234,8 +233,8 @@ func (req changePasswordReq) validate() error {
 	return nil
 }
 
-func (req changePasswordReq) toInput() usecase.ChangePasswordInput {
-	return usecase.ChangePasswordInput{
+func (req changePasswordReq) toInput() users.ChangePasswordInput {
+	return users.ChangePasswordInput{
 		ID:          req.ID,
 		OldPassword: req.OldPassword,
 		NewPassword: req.NewPassword,

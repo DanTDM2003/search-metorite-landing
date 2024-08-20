@@ -1,4 +1,4 @@
-package usecase
+package session
 
 import "github.com/DanTDM2003/search-api-docker-redis/internal/models"
 

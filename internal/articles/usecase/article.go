@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 
-	userSrv "github.com/DanTDM2003/search-api-docker-redis/internal/application/user"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/articles"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/articles/repository"
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
+	"github.com/DanTDM2003/search-api-docker-redis/internal/users"
 	userUC "github.com/DanTDM2003/search-api-docker-redis/internal/users/usecase"
 	serviceLocator "github.com/DanTDM2003/search-api-docker-redis/pkg/locator"
 	"github.com/DanTDM2003/search-api-docker-redis/pkg/utils"
@@ -14,8 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func (uc impleUsecase) GetArticles(ctx context.Context, input GetArticlesInput) (GetArticlesOutput, error) {
-	articles, pag, err := uc.repo.GetArticles(ctx, repository.GetArticlesOptions{
+func (uc impleUsecase) GetArticles(ctx context.Context, input articles.GetArticlesInput) (articles.GetArticlesOutput, error) {
+	as, pag, err := uc.repo.GetArticles(ctx, repository.GetArticlesOptions{
 		GetArticlesFilter: repository.GetArticlesFilter{
 			Author: input.Author,
 		},
@@ -23,16 +24,16 @@ func (uc impleUsecase) GetArticles(ctx context.Context, input GetArticlesInput) 
 	})
 	if err != nil {
 		uc.l.Errorf(ctx, "articles.usecase.GetArticles.repo.GetArticles: %v", err)
-		return GetArticlesOutput{}, err
+		return articles.GetArticlesOutput{}, err
 	}
 
-	return GetArticlesOutput{
-		Articles:  articles,
+	return articles.GetArticlesOutput{
+		Articles:  as,
 		Paginator: pag,
 	}, nil
 }
 
-func (uc impleUsecase) GetOneArticle(ctx context.Context, input GetOneArticleInput) (models.Article, error) {
+func (uc impleUsecase) GetOneArticle(ctx context.Context, input articles.GetOneArticleInput) (models.Article, error) {
 	article, err := uc.redis.GetArticle(ctx, input.Slug)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -62,7 +63,7 @@ func (uc impleUsecase) GetOneArticle(ctx context.Context, input GetOneArticleInp
 	return article, nil
 }
 
-func (uc impleUsecase) CreateArticle(ctx context.Context, input CreateArticleInput) (models.Article, error) {
+func (uc impleUsecase) CreateArticle(ctx context.Context, input articles.CreateArticleInput) (models.Article, error) {
 	slug := utils.Slugify(input.Title)
 	_, err := uc.repo.GetOneArticle(ctx, repository.GetOneArticleOptions{
 		Slug: slug,
@@ -77,8 +78,8 @@ func (uc impleUsecase) CreateArticle(ctx context.Context, input CreateArticleInp
 		return models.Article{}, ErrArticleTitleAlreadyUsed
 	}
 
-	userService := uc.locator.GetService(serviceLocator.UserService).(userSrv.UserUsecase)
-	_, err = userService.GetOneUser(ctx, userSrv.GetOneUserInput{
+	userService := uc.locator.GetService(serviceLocator.UserService).(users.Usecase)
+	_, err = userService.GetOneUser(ctx, users.GetOneUserInput{
 		ID: input.AuthorID,
 	})
 	if err != nil {
@@ -110,7 +111,7 @@ func (uc impleUsecase) CreateArticle(ctx context.Context, input CreateArticleInp
 	return article, nil
 }
 
-func (uc impleUsecase) UpdateArticle(ctx context.Context, input UpdateArticleInput) (models.Article, error) {
+func (uc impleUsecase) UpdateArticle(ctx context.Context, input articles.UpdateArticleInput) (models.Article, error) {
 	article, err := uc.repo.GetOneArticle(ctx, repository.GetOneArticleOptions{
 		ID: input.ID,
 	})

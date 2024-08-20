@@ -1,4 +1,4 @@
-package usecase
+package users
 
 import (
 	"github.com/DanTDM2003/search-api-docker-redis/internal/models"
@@ -18,6 +18,17 @@ type GetUsersInput struct {
 type GetUsersOutput struct {
 	Users     []models.User
 	Paginator paginator.Paginator
+}
+
+type GetOneUserInput struct {
+	ID    uint
+	Email string
+}
+
+type CreateUserInput struct {
+	Username string
+	Email    string
+	Password string
 }
 
 type UpdateUserInput struct {
